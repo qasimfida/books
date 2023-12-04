@@ -1,6 +1,7 @@
 <?php
 
-class Model extends Database{
+class Model extends Database
+{
 
 	public $db;
 
@@ -18,32 +19,33 @@ class Model extends Database{
 	public $table_columns = null;
 
 	// Table `get` and `update` reference
-	public $table_ref = "id"; 
+	public $table_ref = "id";
 	private $queryError = false;
 
 	/**
 	 * Get data by data and `table_ref`
 	 * @param string|array $data
 	 */
-	public function get($data){
+	public function get($data)
+	{
 
 		# Check table name if set
 		$this->checktable_name();
 
 		# Transform to array
-		if( !is_array($data) ){
-			$data = [ $this->table_ref => $data ];
+		if (!is_array($data)) {
+			$data = [$this->table_ref => $data];
 		}
 
 		# Generate array
-		$sql = "SELECT * FROM ". $this->table_name ." WHERE ";
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE ";
 
 		# Append conditional
 		$count = count($data) - 1;
 		$counted = 0;
 		foreach ($data as $key => $value) {
 			$sql .= "$key = :$key";
-			if( $counted < $count ) $sql .= " AND ";
+			if ($counted < $count) $sql .= " AND ";
 			$counted++;
 		}
 
@@ -67,8 +69,9 @@ class Model extends Database{
 	 * @param string $column
 	 * @param string $data
 	 */
-	public function exist($column, $data){
-		$this->query("SELECT * FROM ". $this->table_name ." WHERE ". $column ." = :data");
+	public function exist($column, $data)
+	{
+		$this->query("SELECT * FROM " . $this->table_name . " WHERE " . $column . " = :data");
 		$this->bind(":data", $data);
 		$this->resultSingle();
 		return $this->rowCount();
@@ -78,7 +81,8 @@ class Model extends Database{
 	 * Insert data
 	 * @param array $data Optional.
 	 */
-	public function insert($data = null){
+	public function insert($data = null)
+	{
 
 		# Cast array into an object
 		$this->data = (is_null($data)) ? (object)$this->data : (object)$data;
@@ -89,12 +93,12 @@ class Model extends Database{
 		# Generate query
 		$sql = "INSERT INTO `" . $this->table_name . "` (";
 		$sql_end = "";
-		foreach($this->table_columns as $key => $value) {
-			if( isset( $this->data->{$value} ) ){
-				$sql .= "`". $value . "`, ";
+		foreach ($this->table_columns as $key => $value) {
+			if (isset($this->data->{$value})) {
+				$sql .= "`" . $value . "`, ";
 				$sql_end .= ":" . $value . ',';
-			}else{
-				unset( $value );
+			} else {
+				unset($value);
 			}
 		}
 		$sql = rtrim($sql, ', ') . ') VALUES(' . rtrim($sql_end, ',') . ')';
@@ -109,7 +113,7 @@ class Model extends Database{
 		# Get the inserted ID
 		$this->query("SELECT LAST_INSERT_ID() AS 'last' FROM " . $this->table_name);
 		$newID = $this->resultSingle()->last;
-	
+
 		# Get inserted data
 		return $this->get($newID);
 	}
@@ -119,7 +123,8 @@ class Model extends Database{
 	 * @param array $data Optional.
 	 * @param array $where
 	 */
-	public function update($data = null, $where = []){
+	public function update($data = null, $where = [])
+	{
 
 		# Replace with passed updating data if exist
 		$data = $data ? (object)$data : (object)$this->data;
@@ -130,7 +135,7 @@ class Model extends Database{
 		# Prepare update, check for table columns
 		$sql = 'UPDATE ' . $this->table_name . ' SET ';
 		foreach ($data as $key => $value) {
-			if( in_array($key, $this->table_columns) ){
+			if (in_array($key, $this->table_columns)) {
 				$sql .= $key . " = :" . $key . ',';
 			}
 		}
@@ -144,7 +149,7 @@ class Model extends Database{
 		$counted = 0;
 		foreach ($where as $key => $value) {
 			$sql .= "$key = :$key";
-			if( $counted < $count ) $sql .= " AND ";
+			if ($counted < $count) $sql .= " AND ";
 			$counted++;
 		}
 
@@ -152,13 +157,13 @@ class Model extends Database{
 
 		# Bind parameters
 		$count = 0;
-		foreach($data as $key => $value){
-			if( in_array($key, $this->table_columns) ){
-				$this->bind(":".$key, $value);
+		foreach ($data as $key => $value) {
+			if (in_array($key, $this->table_columns)) {
+				$this->bind(":" . $key, $value);
 			}
 		}
 		foreach ($where as $key => $value) {
-			$this->bind(":".$key, $value);
+			$this->bind(":" . $key, $value);
 		}
 
 		$this->execute();
@@ -171,11 +176,12 @@ class Model extends Database{
 	 * DELETE the current pulled data or passed data
 	 * @param string|arrray $condition Optional.
 	 */
-	public function delete($condition = null){
+	public function delete($condition = null)
+	{
 
 		# Transform to array
-		if( !is_array($condition) ){
-			$condition = [ $this->table_ref => $condition ];
+		if (!is_array($condition)) {
+			$condition = [$this->table_ref => $condition];
 		}
 
 		# Build query, bind parameter and execute query
@@ -186,7 +192,7 @@ class Model extends Database{
 		$counted = 0;
 		foreach ($condition as $key => $value) {
 			$sql .= "$key = :$key";
-			if( $counted < $count ) $sql .= " AND ";
+			if ($counted < $count) $sql .= " AND ";
 			$counted++;
 		}
 
@@ -205,22 +211,25 @@ class Model extends Database{
 	 * @param string $sql
 	 * @param boolean $wildcard
 	 */
-	public function cquery($sql, $wildcard = "*"){
+	public function cquery($sql, $wildcard = "*")
+	{
 		$sql = str_replace($wildcard, $this->table_column_query, $sql);
 		$this->query($sql);
 	}
 
 	# PRIVATE MODEL HELPER
-	private function checktable_name(){
-		if( $this->table_name == null ){
+	private function checktable_name()
+	{
+		if ($this->table_name == null) {
 			echo "ERROR@MODEL.PHP: Table not defined";
 			exit;
-		}else{
+		} else {
 			return true;
 		}
 	}
-	private function checkTableColumns(){
-		if( $this->table_columns == null ){
+	private function checkTableColumns()
+	{
+		if ($this->table_columns == null) {
 			$this->err("Column tables not is defined");
 		}
 	}
@@ -229,8 +238,9 @@ class Model extends Database{
 	 * Throw error message
 	 * @param string $message
 	 */
-	private function err($message){
-		if( DB_ERROR )  echo 'ERROR@MODEL.PHP: ' . $message;
+	protected function err($message)
+	{
+		if (DB_ERROR)  echo 'ERROR@MODEL.PHP: ' . $message;
 		exit;
 	}
 
@@ -238,10 +248,21 @@ class Model extends Database{
 	 * Throw warning message
 	 * @param string $message
 	 */
-	private function warn($message){
-		if( DB_ERROR )  echo 'WARNING@MODEL.PHP: ' . $message;
+	private function warn($message)
+	{
+		if (DB_ERROR)  echo 'WARNING@MODEL.PHP: ' . $message;
 	}
-	
-}
+	/**
+	 * Retrieve all records from the table
+	 * @return array|false
+	 */
+	public function selectAll()
+	{
+		$this->checktable_name();
 
-?>
+		$sql = "SELECT * FROM " . $this->table_name;
+		$this->query($sql);
+
+		return $this->resultSet();  // Assuming resultSet() is a method that fetches all rows
+	}
+}
