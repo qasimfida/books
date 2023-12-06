@@ -27,6 +27,8 @@
 	
 	
 	$routing->post("books", "BookAPI::post");
+	$routing->get("books", "BookAPI::get");
+	$routing->get("book/:id", "BookAPI::getById");
 
 	
 

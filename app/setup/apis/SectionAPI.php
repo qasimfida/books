@@ -20,13 +20,13 @@
                 $chapter_id = $request->getParam('chapter_id');
             }
 
-			if(isset($_POST['title'])) {
+			if(isset($_POST['section_title'])) {
 				
-				$title = $_POST['title'];
+				$section_title = $_POST['section_title'];
 				$content = $_POST['content'];
 
 				$result = $this->taskModel->insert([
-					"title" => $title,
+					"section_title" => $section_title,
                     "content" => $content,
 					"chapter_id" => $chapter_id
 
@@ -39,12 +39,12 @@
 					echo json_encode(["success" => true, "data" => $result]);
 				} else {
 					// Insertion failed
-                    echo json_encode(["failed" => false, "error" => "cha 'title' or 'content' in the request"]);
+                    echo json_encode(["failed" => false, "error" => "cha 'section_title' or 'content' in the request"]);
 
 				}
 			} else {
-				// Show an error if 'title' or 'content' keys are missing
-				echo json_encode(["success" => false, "error" => "Missing 'title' or 'content' in the request"]);
+				// Show an error if 'section_title' or 'content' keys are missing
+				echo json_encode(["success" => false, "error" => "Missing 'section_title' or 'content' in the request"]);
 			}
 		}
 		

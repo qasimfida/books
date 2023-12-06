@@ -11,7 +11,7 @@
 		define('DB_HOSTNAME', 'localhost');
 		define('DB_USERNAME', 'root');
 		define('DB_PASSWORD', '');
-		define('DB_NAME', 'nap');
+		define('DB_NAME', 'books');
 		define('DB_ERROR', true);
 		define("ENVIRONMENT", "DEV");
 
