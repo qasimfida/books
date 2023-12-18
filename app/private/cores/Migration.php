@@ -48,7 +48,7 @@ class Chapters extends Model {
             id INT AUTO_INCREMENT PRIMARY KEY,
             chapter_name VARCHAR(255) NOT NULL,
             book_id INT,
-            FOREIGN KEY (book_id) REFERENCES books(book_id)
+            FOREIGN KEY (book_id) REFERENCES books(id)
         )";
         $this->runMigration($sql);
     }
@@ -63,12 +63,11 @@ class Sections extends Model {
             chapter_id INT,
             FOREIGN KEY (chapter_id) REFERENCES chapters(id),
             book_id INT,
-            FOREIGN KEY (book_id) REFERENCES books(book_id)
+            FOREIGN KEY (book_id) REFERENCES books(id)
         )";
         $this->runMigration($sql);
     }
 }
-
 // Database configuration
 // $clas = new Database();
 $dbHost = "localhost";
