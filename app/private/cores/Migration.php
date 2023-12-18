@@ -61,7 +61,9 @@ class Sections extends Model {
             section_title VARCHAR(255) NOT NULL,
             content TEXT,
             chapter_id INT,
-            FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+            FOREIGN KEY (chapter_id) REFERENCES chapters(id),
+            book_id INT,
+            FOREIGN KEY (book_id) REFERENCES books(book_id)
         )";
         $this->runMigration($sql);
     }

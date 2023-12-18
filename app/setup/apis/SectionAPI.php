@@ -16,10 +16,14 @@
 		public function post($request){
             if (is_array($request)) {
                 $chapter_id = $request['chapter_id'];
+				$book_id = $request['book_id'];
             } elseif (is_object($request) && method_exists($request, 'getParam')) {
                 $chapter_id = $request->getParam('chapter_id');
+				$book_id = $request->getParam('book_id');
+
             }
 
+			var_dump($request);
 			if(isset($_POST['section_title'])) {
 				
 				$section_title = $_POST['section_title'];
@@ -28,7 +32,8 @@
 				$result = $this->taskModel->insert([
 					"section_title" => $section_title,
                     "content" => $content,
-					"chapter_id" => $chapter_id
+					"chapter_id" => $chapter_id,
+					"book_id" => $book_id
 
 				]);
 		

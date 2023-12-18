@@ -32,10 +32,10 @@
 
 	
 
-	$routing->post("book/:book_id/chapters", "ChapterAPI::post");
+	$routing->post("book/:book_id", "ChapterAPI::post");
 
 
 
-	$routing->post("book/:book_id/chapter/:chapter_id/sections", "SectionAPI::post");
+	$routing->post("book/:book_id/chapter/:chapter_id", "SectionAPI::post");
 
 ?>

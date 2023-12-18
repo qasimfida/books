@@ -10,7 +10,6 @@ class BookAPI extends Api
 		$this->taskModel = $this->model("Book");
 		$this->chapterModel = $this->model("Chapter");
 		$this->sectionModel = $this->model("Section");
-
 	}
 	public function get()
 	{
@@ -32,17 +31,33 @@ class BookAPI extends Api
 	}
 	public function getById($bookId)
 	{
-		$book = $this->taskModel->get($bookId);
-		$chapter = $this->chapterModel->getChapter($bookId);
-		$section = $this->sectionModel->getSection($bookId);
+		$book = json_decode(json_encode($this->taskModel->get($bookId)), true);
+		$chapters = json_decode(json_encode($this->chapterModel->getChapter($bookId)), true);
+		$sections = json_decode(json_encode($this->sectionModel->getSection($bookId)), true);
 
-		if ($book !== false && $chapter !== false && $section !== false) {
+
+
+		if ($book !== false && $chapters !== false && $sections !== false) {
 			// Combine both data sets into a single array
+			$combinedChapters = [];
+
+			foreach ($chapters as $chapter) {
+				$combinedChapter = $chapter;
+				$combinedChapter['sections'] = [];
+
+				foreach ($sections as $section) {
+					if ($section['chapter_id'] === $chapter['id']) {
+						$combinedChapter['sections'][] = $section;
+					}
+				}
+
+				$combinedChapters[] = $combinedChapter;
+			}
+
+			// Combine all data into a single array
 			$combinedData = [
 				"book" => $book,
-				"chapter" => $chapter,
-				"section" => $section,
-
+				"chapters" => $combinedChapters,
 			];
 
 			// Return the combined data as JSON
