@@ -72,34 +72,59 @@ class BookAPI extends Api
 		}
 	}
 
-
+	public function generateUniqueFileName($originalName) {
+		$path = "public/assets/images/";
+		$extension = pathinfo($originalName, PATHINFO_EXTENSION);		
+		$date = date('YmdHis');
+		$uniqueName = "{$path}book_{$date}.{$extension}";
+		return $uniqueName;
+	}
+	
 	public function post()
 	{
 		if (isset($_POST['book_title'], $_POST['author'])) {
 			$book_title = $_POST['book_title'];
 			$author = $_POST['author'];
-			$description = $_POST['description'];
-			$image = $_POST['image'];
+			$description = isset($_POST['description']) ? $_POST['description'] : '';
+			$fileHandler = new File("public/assets/images/");
+			$fileName =$_FILES['image']['name'];
 
-			$result = $this->taskModel->insert([
-				"book_title" => $book_title,
-				"author" => $author,
-				"description" => $description,
-				"image" => $image
-			]);
+			$uploadedFiles = $fileHandler->handle($_FILES['image'], "book_", true);
+			// Check for errors during file upload
+			if ($fileHandler->result && !empty($uploadedFiles)) {
+				// $image = $_FILES['image']['name'];
+				$image = $this->generateUniqueFileName($fileName);
 
-			header('Content-Type: application/json');
-
-			if ($result !== false) {
-				echo json_encode(["success" => true, "data" => $result]);
+				// var_dump($uploadedFiles[$fileName]);
+				
+				if (!empty($image)) {
+					// Your existing code to insert data into the database
+					$result = $this->taskModel->insert([
+						"book_title" => $book_title,
+						"author" => $author,
+						"description" => $description,
+						"image" => $image
+					]);
+		
+					header('Content-Type: application/json');
+		
+					if ($result !== false) {
+						echo json_encode(["success" => true, "data" => $result]);
+						return; // Stop further execution to prevent error messages in the else block from being sent
+					} else {
+						$error = $this->taskModel->getError();
+						echo json_encode(["success" => false, "error" => $error]);
+					}
+				} else {
+					echo json_encode(["success" => false, "error" => "Image file not uploaded or processed correctly"]);
+				}
 			} else {
-				$error = $this->taskModel->getError();
+				$error = is_string($uploadedFiles) ? $uploadedFiles : "File upload failed";
 				echo json_encode(["success" => false, "error" => $error]);
 			}
-		} else {
-			echo json_encode(["success" => false, "error" => "Missing 'title' or 'content' in the request"]);
 		}
 	}
+
 
 
 	public function put()

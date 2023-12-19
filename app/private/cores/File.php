@@ -9,22 +9,31 @@
  *  3. Call the check method passing the array of files for `CHECKING`
  *  4. Call the upload method passing the array of files for `UPLOADING`
  */
-class File{
-	
+class File
+{
+
 	private $DEFAULT_location = "";
-	// public $DEFAULT_maximum_size = 5242880;
 	public $result = false;
 	public $files = [];
 
 	/**
-	 * FIle constructor
+	 * File constructor
 	 * @param `location` setup the default location for the upload
 	 **/
-	public function __construct($location = null){
+	public function __construct($location = null)
+	{
 
 		// Set the active location of the uploading files
-		if( $location != null ){
+		if ($location != null) {
 			$this->DEFAULT_location = $location;
+		} else {
+			$projectRoot = dirname(__DIR__); // Assuming this file is in a subdirectory of your project
+			$this->DEFAULT_location = $projectRoot . "/public/assets/images/";
+
+			// Create the directory if it doesn't exist
+			if (!is_dir($this->DEFAULT_location)) {
+				mkdir($this->DEFAULT_location, 0777, true);
+			}
 		}
 	}
 
@@ -32,62 +41,59 @@ class File{
 	 * Error Checking then handle
 	 * @param array `files` contains all the files
 	 * @param string `file_name` contain the id or the key of the said image
-     * @param boolean $upload
+	 * @param boolean $upload
 	 * @return array `array` contains all the returned parameters
 	 **/
-	public function handle($files, $file_name = "", $upload = false){
+	public function handle($files, $file_name = "", $upload = false)
+	{
 
-		# Orgaize files of the multiple uploads from the $_FILES
+		# Organize files of the multiple uploads from the $_FILES
 		$allowed_type = ["png", "jpeg", "jpg", "docx", "pdf", "ppt"];
 
 		# Organize `multiple` uploads
-		if( is_array($files['name']) ){
+		if (is_array($files['name'])) {
 			$files = $this->organize($files);
 
-		# Organize `single` upload
-		}else{
-
+			# Organize `single` upload
+		} else {
 			// Store, reset, and update
 			$temp = $files;
 			$files = [];
 			array_push($files, $temp);
-
 		}
 
 		# Return if no value
-		if( $files[0]['name'] == '' ){
+		if ($files[0]['name'] == '') {
 			return "No file is uploaded";
 		}
 
-		for( $i = 0, $l = count($files); $i < $l; $i++ ){
-
+		for ($i = 0, $l = count($files); $i < $l; $i++) {
 			# Check for the Extension name
 			$type = explode('.', $files[$i]['name']);
-			$type = strtolower( end($type) );
+			$type = strtolower(end($type));
 
-			if( !in_array($type, $allowed_type) ){
+			if (!in_array($type, $allowed_type)) {
 				return "Invalid file type";
 			}
 
 			# Check for error
-			if( $files[$i]['error'] == 1 ){
+			if ($files[$i]['error'] == 1) {
 				return "Corrupted file";
 			}
 
-			# Generate the actual name
-			# Only one [filename].[type] || Bunch [filename_count].[type]
-			$actual_name = ( $i + 1 == $l && $i == 0 ) ? $file_name . "." . $type : $file_name . "_" . $i . "." . $type;
+			# Generate the actual name using the date
+			$date = date('YmdHis');
+			$actual_name = $file_name . "_" . $date . "." . $type;
 
 			# Merge the files data and the actual name array
 			$files[$i] = array_merge($files[$i], ["actual_name" => $actual_name]);
-
 		}
 
 		# Check for upload, or return `true` if no error
-		if( $upload ){
+		if ($upload) {
 			$this->files = $files;
 			return $this->upload($files);
-		}else{
+		} else {
 			$this->files = $files;
 			return $files;
 		}
@@ -98,14 +104,14 @@ class File{
 	 * @param array $files files to organize
 	 * @return array
 	 **/
-	public function organize($files){
+	public function organize($files)
+	{
 
 		// Returning array
 		$returning = [];
 
-		// Loop every files
-		for( $i = 0, $l = count( $files['name'] ); $i < $l; $i++ ){
-
+		// Loop every file
+		for ($i = 0, $l = count($files['name']); $i < $l; $i++) {
 			$inner = [
 				'name' => $files['name'][$i],
 				'type' => $files['type'][$i],
@@ -115,7 +121,6 @@ class File{
 			];
 
 			array_push($returning, $inner);
-
 		}
 
 		// Return the new data
@@ -127,24 +132,41 @@ class File{
 	 * @param `files` contains all the files
 	 * @return bool
 	 **/
-	public function upload($files){
-
+	/**
+	 * File uploading 
+	 * @param array $files Contains all the files
+	 * @return bool
+	 */
+	public function upload($files)
+	{
 		// Upload every image
-		for( $i = 0, $l = count($files); $i < $l; $i++ ){
+		for ($i = 0, $l = count($files); $i < $l; $i++) {
+			$sourcePath = $files[$i]['tmp_name'];
+			$destinationPath = $this->DEFAULT_location . $files[$i]['actual_name'];
 
-			// Move to the upload folder
-			if( !move_uploaded_file( $files[$i]['tmp_name'] , $this->DEFAULT_location . $files[$i]['actual_name']) ){
+			// Check if the source file exists
+			if (!file_exists($sourcePath)) {
 				$this->result = false;
 				return false;
 			}
 
+			// Check if the destination directory exists, create it if not
+			$destinationDirectory = dirname($destinationPath);
+			if (!is_dir($destinationDirectory)) {
+				mkdir($destinationDirectory, 0777, true);
+			}
+
+			// Move to the upload folder
+			$success = move_uploaded_file($sourcePath, $destinationPath);
+
+			if (!$success) {
+				$this->result = false;
+				return false;
+			}
 		}
 
 		// Return flag
 		$this->result = true;
 		return true;
 	}
-
 }
-
-?>
