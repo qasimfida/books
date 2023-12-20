@@ -73,7 +73,7 @@ class BookAPI extends Api
 	}
 
 	public function generateUniqueFileName($originalName) {
-		$path = "public/assets/images/";
+		$path = "assets/images/";
 		$extension = pathinfo($originalName, PATHINFO_EXTENSION);		
 		$date = date('YmdHis');
 		$uniqueName = "{$path}book_{$date}.{$extension}";
@@ -86,10 +86,11 @@ class BookAPI extends Api
 			$book_title = $_POST['book_title'];
 			$author = $_POST['author'];
 			$description = isset($_POST['description']) ? $_POST['description'] : '';
-			$fileHandler = new File("public/assets/images/");
-			$fileName =$_FILES['image']['name'];
+			$fileHandler = new File("assets/images/");
+			$fileName =@$_FILES['image']['name'];
 
-			$uploadedFiles = $fileHandler->handle($_FILES['image'], "book_", true);
+			
+			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
 			// Check for errors during file upload
 			if ($fileHandler->result && !empty($uploadedFiles)) {
 				// $image = $_FILES['image']['name'];

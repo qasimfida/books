@@ -47,13 +47,12 @@ class File
 	public function handle($files, $file_name = "", $upload = false)
 	{
 
+		// var_dump($files);
 		# Organize files of the multiple uploads from the $_FILES
 		$allowed_type = ["png", "jpeg", "jpg", "docx", "pdf", "ppt"];
 
 		# Organize `multiple` uploads
 		if (is_array($files['name'])) {
-			$files = $this->organize($files);
-
 			# Organize `single` upload
 		} else {
 			// Store, reset, and update
