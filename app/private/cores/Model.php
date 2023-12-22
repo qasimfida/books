@@ -163,7 +163,7 @@ class Model extends Database
 			}
 		}
 		foreach ($where as $key => $value) {
-			$this->bind(":" . $key, $value);
+			$this->bind(":" . $key, $value['id']);
 		}
 
 		$this->execute();

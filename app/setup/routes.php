@@ -27,8 +27,10 @@
 	
 	
 	$routing->post("books", "BookAPI::post");
+	$routing->put("books/:id", "BookAPI::put");
+
 	$routing->get("books", "BookAPI::get");
-	$routing->get("book/:id", "BookAPI::getById");
+	$routing->get("books/:id", "BookAPI::getById");
 
 	
 

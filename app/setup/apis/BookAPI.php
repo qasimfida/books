@@ -72,14 +72,15 @@ class BookAPI extends Api
 		}
 	}
 
-	public function generateUniqueFileName($originalName) {
+	public function generateUniqueFileName($originalName)
+	{
 		$path = "assets/images/";
-		$extension = pathinfo($originalName, PATHINFO_EXTENSION);		
+		$extension = pathinfo($originalName, PATHINFO_EXTENSION);
 		$date = date('YmdHis');
 		$uniqueName = "{$path}book_{$date}.{$extension}";
 		return $uniqueName;
 	}
-	
+
 	public function post()
 	{
 		if (isset($_POST['book_title'], $_POST['author'])) {
@@ -87,31 +88,27 @@ class BookAPI extends Api
 			$author = $_POST['author'];
 			$description = isset($_POST['description']) ? $_POST['description'] : '';
 			$fileHandler = new File("assets/images/");
-			$fileName =@$_FILES['image']['name'];
+			$fileName = @$_FILES['image']['name'];
 
-			
+
 			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
-			// Check for errors during file upload
 			if ($fileHandler->result && !empty($uploadedFiles)) {
-				// $image = $_FILES['image']['name'];
 				$image = $this->generateUniqueFileName($fileName);
 
-				// var_dump($uploadedFiles[$fileName]);
-				
+
 				if (!empty($image)) {
-					// Your existing code to insert data into the database
 					$result = $this->taskModel->insert([
 						"book_title" => $book_title,
 						"author" => $author,
 						"description" => $description,
 						"image" => $image
 					]);
-		
+
 					header('Content-Type: application/json');
-		
+
 					if ($result !== false) {
 						echo json_encode(["success" => true, "data" => $result]);
-						return; // Stop further execution to prevent error messages in the else block from being sent
+						return; 
 					} else {
 						$error = $this->taskModel->getError();
 						echo json_encode(["success" => false, "error" => $error]);
@@ -127,14 +124,66 @@ class BookAPI extends Api
 	}
 
 
-
-	public function put()
+	public function put($id)
 	{
-		$this->json([
-			"message" => "Updating something using " . $_SERVER['REQUEST_METHOD'] . " request?",
-			"request" => $this->request
-		]);
+		if (isset($_POST['book_title'], $_POST['author'])) {
+			$book_title = $_POST['book_title'];
+			$author = $_POST['author'];
+			$description = isset($_POST['description']) ? $_POST['description'] : '';
+
+			if (isset($_FILES['image'])) {
+				$fileHandler = new File("assets/images/");
+				$fileName = @$_FILES['image']['name'];
+
+				$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
+
+				if ($fileHandler->result && !empty($uploadedFiles)) {
+					$image = $this->generateUniqueFileName($fileName);
+				} else {
+					$error = is_string($uploadedFiles) ? $uploadedFiles : "File upload failed";
+					echo json_encode(["success" => false, "error" => $error]);
+					return;
+				}
+			} else {
+				
+				$image = ""; 
+			}
+			$newData = [
+				"book_title" => $book_title,
+				"author" => $author,
+				"description" => $description,
+				"image" => $image
+			];
+			$called_id = [
+				'id'=> $id,
+			];
+
+			$updateResult = $this->taskModel->update($newData, $called_id);
+
+			if ($updateResult !== false) {
+				echo json_encode(["success" => true, "data" => $updateResult]);
+				return;
+			} else {
+				$error = $this->taskModel->getError();
+				echo json_encode(["success" => false, "error" => $error]);
+			}
+		} else {
+			$missingFields = [];
+
+			if (!isset($_POST['book_title'])) {
+				$missingFields[] = 'book_title';
+			}
+
+			if (!isset($_POST['author'])) {
+				$missingFields[] = 'author';
+			}
+
+			$error = "Missing required data in the request. Fields missing: " . implode(', ', $missingFields);
+			echo json_encode(["success" => false, "error" => $error]);
+		}
 	}
+
+
 
 	public function delete()
 	{
