@@ -5,16 +5,25 @@
  */
 class BookAPI extends Api
 {
+	private $bookModel;
+	private $chapterModel;
+	private $sectionModel;
+	private $citationModel;
+	private $figureModel;
+
 	function __construct()
 	{
-		$this->taskModel = $this->model("Book");
+		$this->bookModel = $this->model("Book");
 		$this->chapterModel = $this->model("Chapter");
 		$this->sectionModel = $this->model("Section");
+		$this->citationModel = $this->model("Citation");
+		$this->figureModel = $this->model("Figure");
+
 	}
 	public function get()
 	{
 		// Check if book_id is set in the request
-		$books = $this->taskModel->selectAll();
+		$books = $this->bookModel->selectAll();
 
 
 		// Check if any books were found
@@ -24,17 +33,18 @@ class BookAPI extends Api
 			echo json_encode(["success" => true, "data" => $books]);
 		} else {
 			// If no books found, return an error
-			$error = $this->taskModel->getError();
+			$error = $this->bookModel->getError();
 			header('Content-Type: application/json');
 			echo json_encode(["success" => false, "error" => $error]);
 		}
 	}
 	public function getById($bookId)
 	{
-		$book = json_decode(json_encode($this->taskModel->get($bookId)), true);
+		$book = json_decode(json_encode($this->bookModel->get($bookId)), true);
 		$chapters = json_decode(json_encode($this->chapterModel->getChapter($bookId)), true);
 		$sections = json_decode(json_encode($this->sectionModel->getSection($bookId)), true);
-
+		$citations = json_decode(json_encode($this->citationModel->getCitation($bookId)), true);
+		$figures = json_decode(json_encode($this->figureModel->getFigure($bookId)), true);
 
 
 		if ($book !== false && $chapters !== false && $sections !== false) {
@@ -44,7 +54,7 @@ class BookAPI extends Api
 			foreach ($chapters as $chapter) {
 				$combinedChapter = $chapter;
 				$combinedChapter['sections'] = [];
-
+				
 				foreach ($sections as $section) {
 					if ($section['chapter_id'] === $chapter['id']) {
 						$combinedChapter['sections'][] = $section;
@@ -53,20 +63,19 @@ class BookAPI extends Api
 
 				$combinedChapters[] = $combinedChapter;
 			}
-
 			// Combine all data into a single array
 			$combinedData = [
 				"book" => $book,
 				"chapters" => $combinedChapters,
+				"citations"=> $citations,
+				"figure"=> $figures
+
 			];
 
 			// Return the combined data as JSON
 			header('Content-Type: application/json');
 			echo json_encode(["success" => true, "data" => $combinedData]);
 		} else {
-			// If either the book or chapter is not found, return an error
-			// $error = $book !== false ? $this->taskModel->getError() : $this->chapterModel->getError();
-
 			header('Content-Type: application/json');
 			echo json_encode(["success" => false, "error" => "error"]);
 		}
@@ -74,7 +83,7 @@ class BookAPI extends Api
 
 	public function generateUniqueFileName($originalName)
 	{
-		$path = "assets/images/";
+		$path = "public/assets/images/";
 		$extension = pathinfo($originalName, PATHINFO_EXTENSION);
 		$date = date('YmdHis');
 		$uniqueName = "{$path}book_{$date}.{$extension}";
@@ -83,6 +92,7 @@ class BookAPI extends Api
 
 	public function post()
 	{
+		 
 		if (isset($_POST['book_title'], $_POST['author'])) {
 			$book_title = $_POST['book_title'];
 			$author = $_POST['author'];
@@ -91,13 +101,13 @@ class BookAPI extends Api
 			$fileName = @$_FILES['image']['name'];
 
 
-			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
+			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book", true);
 			if ($fileHandler->result && !empty($uploadedFiles)) {
 				$image = $this->generateUniqueFileName($fileName);
 
 
 				if (!empty($image)) {
-					$result = $this->taskModel->insert([
+					$result = $this->bookModel->insert([
 						"book_title" => $book_title,
 						"author" => $author,
 						"description" => $description,
@@ -110,7 +120,7 @@ class BookAPI extends Api
 						echo json_encode(["success" => true, "data" => $result]);
 						return; 
 					} else {
-						$error = $this->taskModel->getError();
+						$error = $this->bookModel->getError();
 						echo json_encode(["success" => false, "error" => $error]);
 					}
 				} else {
@@ -158,13 +168,13 @@ class BookAPI extends Api
 				'id'=> $id,
 			];
 
-			$updateResult = $this->taskModel->update($newData, $called_id);
+			$updateResult = $this->bookModel->update($newData, $called_id);
 
 			if ($updateResult !== false) {
 				echo json_encode(["success" => true, "data" => $updateResult]);
 				return;
 			} else {
-				$error = $this->taskModel->getError();
+				$error = $this->bookModel->getError();
 				echo json_encode(["success" => false, "error" => $error]);
 			}
 		} else {
@@ -195,7 +205,6 @@ class BookAPI extends Api
 	public function foobar()
 	{
 		$this->json([
-			"id" => "The id is `$this->id`",
 			"message" => "You're now accessing this method by DEFINED_METHOD."
 		]);
 	}

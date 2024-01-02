@@ -25,19 +25,33 @@
 	$routing->post("auth/check", "AuthAPI::check");
 	$routing->post("auth/logout", "AuthAPI::logout");
 	
-	
+	//books
 	$routing->post("books", "BookAPI::post");
 	$routing->put("books/:id", "BookAPI::put");
-
 	$routing->get("books", "BookAPI::get");
 	$routing->get("books/:id", "BookAPI::getById");
 
+	//chapter
+	$routing->post("chapter/:book_id", "ChapterAPI::post");
+	$routing->get("chapters", "ChapterAPI::get");
+	$routing->get("chapter/:book_id", "ChapterAPI::getById");
+
 	
-
-	$routing->post("book/:book_id", "ChapterAPI::post");
-
-
-
+	//section
 	$routing->post("book/:book_id/chapter/:chapter_id", "SectionAPI::post");
+	$routing->get("sections", "SectionAPI::get");
+	$routing->get("section/:book_id", "SectionAPI::getById");
+
+	//citation
+	$routing->post("figure/:book_id", "CitationAPI::post");
+	$routing->get("citations", "CitationAPI::get");
+	$routing->get("citation/:book_id", "CitationAPI::getById");
+
+	//figure
+	$routing->post("figure/:book_id", "FigureAPI::post");
+	$routing->get("figures", "FigureAPI::get");
+	$routing->get("figures/:book_id", "FigureAPI::getById");
+
+
 
 ?>

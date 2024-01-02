@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `books` (
   `description` text,
   `image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `books`
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `chapters` (
   `book_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `book_id` (`book_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `chapters`
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `sections` (
   PRIMARY KEY (`id`),
   KEY `chapter_id` (`chapter_id`),
   KEY `book_id` (`book_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `sections`

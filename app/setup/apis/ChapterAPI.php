@@ -4,15 +4,41 @@
 	 * Test class
 	 */
 	class ChapterAPI extends Api{
+		private $chapterModel;
+		private $bookModel;
 		function __construct(){
-			$this->taskModel = $this->model("Chapter");
-		}
-		public function get(){
-			$this->json([
-				"message" => "You get this using " . $_SERVER['REQUEST_METHOD'] . " request"
-			]);
-		}
+			$this->chapterModel = $this->model("Chapter");
+			$this->bookModel = $this->model("Book");
 
+		}
+		public function get()
+		{
+			// Check if book_id is set in the request
+			$books = $this->chapterModel->selectAll();
+	
+			// Check if any books were found
+			if ($books !== false) {
+				// Return the books as JSON
+				header('Content-Type: application/json');
+				echo json_encode(["success" => true, "data" => $books]);
+			} else {
+				// If no books found, return an error
+				$error = $this->chapterModel->getError();
+				header('Content-Type: application/json');
+				echo json_encode(["success" => false, "error" => $error]);
+			}
+		}
+		public function getById($bookId)
+		{
+					
+			$chaptersById = json_decode(json_encode($this->chapterModel->getChapter($bookId)), true);
+				// Return the combined data as JSON
+				header('Content-Type: application/json');
+				echo json_encode(["success" => true, "data" => $chaptersById]);
+				
+
+		
+		}
 		public function post($request){
             if (is_array($request)) {
                 $book_id = $request['book_id'];
@@ -24,7 +50,7 @@
 			if(isset($_POST['chapter_name'])) {
 				
 				$author = $_POST['chapter_name'];
-				$result = $this->taskModel->insert([
+				$result = $this->chapterModel->insert([
 					"chapter_name" => $author,
                     "book_id" => $book_id
 
@@ -62,7 +88,6 @@
 
 		public function foobar(){
 			$this->json([
-				"id" => "The id is `$this->id`",
 				"message" => "You're now accessing this method by DEFINED_METHOD."
 			]);
 		}

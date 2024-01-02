@@ -14,7 +14,6 @@
 		private $user = DB_USERNAME;
 		private $pass = DB_PASSWORD;
 		private $dbname = DB_NAME;
-
 		private $dbh; // Database Handler
 		private $stmt; // Database Statement
 		private $error; // Database Error

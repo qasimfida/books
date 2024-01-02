@@ -43,6 +43,13 @@
 		'Validate',
 		'File'
 	];
+	require_once 'private/cores/Api.php';
+	require_once 'private/cores/Core.php';
+	require_once 'private/cores/Database.php';
+	require_once 'private/cores/Model.php';
+	require_once 'private/cores/Routing.php';
+	require_once 'private/cores/Validate.php';
+	require_once 'private/cores/File.php';
 
 	foreach ($DRIVERS as $value){
 		require_once 'private/Cores/' . $value . '.php';

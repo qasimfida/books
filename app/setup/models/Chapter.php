@@ -8,18 +8,14 @@
 		}
 		public function getChapter($data)
 		{
-			$bookId = isset($data['id']) ? $data['id'] : 1;
+			$bookId = isset($data['id']) ? $data['id'] : $data['book_id'] ;
 		
-			# Generate array
 			$sql = "SELECT * FROM " . $this->table_name . " WHERE book_id = :book_id";
 		
-			# Pass query
 			$this->query($sql);
 		
-			# Bind parameter
 			$this->bind("book_id", $bookId);
 		
-			# Save data to global data holder object
 			$this->data = $this->resultSet();
 			$this->exist = ($this->rowCount() > 0);
 		

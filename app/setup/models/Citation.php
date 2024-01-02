@@ -1,16 +1,16 @@
 <?php 
 
-	class Section extends Model{
+	class Citation extends Model{
 		
 		function __construct(){
-			$this->table_name = "Sections";
-		    $this->table_columns = ["id", "section_title",  "content","chapter_id","book_id"];
+			$this->table_name = "Citations";
+		    $this->table_columns = ["id", "book_id","citation_id","citation_name"];
 		}
 
-		public function getSection($data)
+		public function getCitation($data)
 		{
-
-			$bookId = isset($data['id']) ? $data['id'] : $data['book_id'];
+			
+			$bookId = isset($data['id']) ? $data['id'] :  $data['book_id'] ;
 		
 			$sql = "SELECT * FROM " . $this->table_name . " WHERE book_id = :book_id";
 		
@@ -24,4 +24,5 @@
 			return $this->data;
 		}
 	}
+
 ?>

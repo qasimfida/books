@@ -1,7 +1,9 @@
 <?php
 
-class Model {
+class Migration {
     protected $connection;
+    public $queryError;
+
 	public function __construct($host, $user, $pass, $dbName)
     {
         $this->connection = new mysqli($host, $user, $pass, $dbName);
@@ -16,9 +18,11 @@ class Model {
         $result = $this->connection->query($sql);
 
         if ($result === TRUE) {
-            echo "Table created successfully";
+            $this->queryError = false;
+
         } else {
             echo "Error creating table: " . $this->connection->error;
+            $this->queryError = true;
         }
 
         return $result;
@@ -29,8 +33,8 @@ class Model {
         $this->connection->close();
     }
 }
-class Book extends Model {
-    public function createBooksTable() {
+class Books extends Migration {
+    public function createTable() {
         $sql = "CREATE TABLE IF NOT EXISTS books (
             id INT AUTO_INCREMENT PRIMARY KEY,
             book_title VARCHAR(255) NOT NULL,
@@ -42,8 +46,8 @@ class Book extends Model {
     }
 }
 
-class Chapters extends Model {
-    public function createChaptersTable() {
+class Chapters extends Migration {
+    public function createTable() {
         $sql = "CREATE TABLE IF NOT EXISTS chapters (
             id INT AUTO_INCREMENT PRIMARY KEY,
             chapter_name VARCHAR(255) NOT NULL,
@@ -54,8 +58,8 @@ class Chapters extends Model {
     }
 }
 
-class Sections extends Model {
-    public function createSectionsTable() {
+class Sections extends Migration {
+    public function createTable() {
         $sql = "CREATE TABLE IF NOT EXISTS sections (
             id INT AUTO_INCREMENT PRIMARY KEY,
             section_title VARCHAR(255) NOT NULL,
@@ -68,6 +72,37 @@ class Sections extends Model {
         $this->runMigration($sql);
     }
 }
+
+class Citation extends Migration {
+    public function createTable() {
+        $sql = "CREATE TABLE IF NOT EXISTS citations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            citation_name VARCHAR(255) NOT NULL,
+            citation_id VARCHAR(255) NOT NULL,
+            book_id INT,
+            chapter_id INT,
+            FOREIGN KEY (book_id) REFERENCES books(id),
+            FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+        )";
+        $this->runMigration($sql);
+    }
+}
+class Figure extends Migration {
+    public function createTable() {
+        $sql = "CREATE TABLE IF NOT EXISTS Figures (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            figure_name VARCHAR(255) NOT NULL,
+            figure_id VARCHAR(255) NOT NULL,
+            figure_image VARCHAR(255),
+            book_id INT,
+            chapter_id INT,
+            FOREIGN KEY (book_id) REFERENCES books(id),
+            FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+        )";
+        $this->runMigration($sql);
+    }
+}
+
 // Database configuration
 // $clas = new Database();
 $dbHost = "localhost";
@@ -75,25 +110,35 @@ $dbUser = "root";
 $dbPass = "";
 $dbName = "books";
 
-// Create instances of the Model class
-$bookModel = new Book($dbHost, $dbUser, $dbPass, $dbName);
-$chaptersModel = new Chapters($dbHost, $dbUser, $dbPass, $dbName);
-$sectionsModel = new Sections($dbHost, $dbUser, $dbPass, $dbName);
+$booksmigration = new Books($dbHost, $dbUser, $dbPass, $dbName);
+$chaptersmigration = new Chapters($dbHost, $dbUser, $dbPass, $dbName);
+$sectionsmigration = new Sections($dbHost, $dbUser, $dbPass, $dbName);
+$citationmigration = new Citation($dbHost, $dbUser, $dbPass, $dbName);
+$figuremigration = new Figure($dbHost, $dbUser, $dbPass, $dbName);
 
 // Run migrations
-$bookModel->createBooksTable();
-$chaptersModel->createChaptersTable();
-$sectionsModel->createSectionsTable();
+$booksmigration->createTable();
+$chaptersmigration->createTable();
+$sectionsmigration->createTable();
+$citationmigration->createTable();
+$figuremigration->createTable();
 
 // Output result
-if (!$bookModel->queryError && !$chaptersModel->queryError && !$sectionsModel->queryError) {
-    echo "Tables created successfully: books, chapters, sections";
+$tables = ['books', 'chapters', 'sections', 'citation', 'figure'];
+$errorFlag = false;
+
+foreach ($tables as $table) {
+    $migration = new $table($dbHost, $dbUser, $dbPass, $dbName);
+    if ($migration->queryError) {
+        $errorFlag = true;
+        echo "Error creating table: $table\n";
+    }
+    $migration->closeConnection();
+}
+
+if (!$errorFlag) {
+    echo "Tables created successfully: " . implode(', ', $tables);
 } else {
     echo "Error creating tables";
 }
-
-// Close database connections if necessary
-$bookModel->closeConnection();
-$chaptersModel->closeConnection();
-$sectionsModel->closeConnection();
 ?>
