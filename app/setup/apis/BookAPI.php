@@ -18,7 +18,6 @@ class BookAPI extends Api
 		$this->sectionModel = $this->model("Section");
 		$this->citationModel = $this->model("Citation");
 		$this->figureModel = $this->model("Figure");
-
 	}
 	public function get()
 	{
@@ -54,7 +53,7 @@ class BookAPI extends Api
 			foreach ($chapters as $chapter) {
 				$combinedChapter = $chapter;
 				$combinedChapter['sections'] = [];
-				
+
 				foreach ($sections as $section) {
 					if ($section['chapter_id'] === $chapter['id']) {
 						$combinedChapter['sections'][] = $section;
@@ -67,8 +66,8 @@ class BookAPI extends Api
 			$combinedData = [
 				"book" => $book,
 				"chapters" => $combinedChapters,
-				"citations"=> $citations,
-				"figure"=> $figures
+				"citations" => $citations,
+				"figure" => $figures
 
 			];
 
@@ -92,7 +91,7 @@ class BookAPI extends Api
 
 	public function post()
 	{
-		 
+
 		if (isset($_POST['book_title'], $_POST['author'])) {
 			$book_title = $_POST['book_title'];
 			$author = $_POST['author'];
@@ -118,7 +117,7 @@ class BookAPI extends Api
 
 					if ($result !== false) {
 						echo json_encode(["success" => true, "data" => $result]);
-						return; 
+						return;
 					} else {
 						$error = $this->bookModel->getError();
 						echo json_encode(["success" => false, "error" => $error]);
@@ -136,62 +135,55 @@ class BookAPI extends Api
 
 	public function put($id)
 	{
-		if (isset($_POST['book_title'], $_POST['author'])) {
-			$book_title = $_POST['book_title'];
-			$author = $_POST['author'];
-			$description = isset($_POST['description']) ? $_POST['description'] : '';
+		$existingData = $this->bookModel->getById($id);
 
-			if (isset($_FILES['image'])) {
-				$fileHandler = new File("assets/images/");
-				$fileName = @$_FILES['image']['name'];
+		if (!$existingData) {
+			echo json_encode(["success" => false, "error" => "Book not found"]);
+			return;
+		}
 
-				$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
 
-				if ($fileHandler->result && !empty($uploadedFiles)) {
-					$image = $this->generateUniqueFileName($fileName);
-				} else {
-					$error = is_string($uploadedFiles) ? $uploadedFiles : "File upload failed";
-					echo json_encode(["success" => false, "error" => $error]);
-					return;
-				}
+		$book_title = isset($_POST['book_title'])  && $_POST['book_title'] !== '' ? $_POST['book_title'] : $existingData[0]->book_title;
+		$author = isset($_POST['author'])  && $_POST['author'] !== '' ? $_POST['author'] : $existingData[0]->author;
+		$description = isset($_POST['description']) && $_POST['description'] !== '' ? $_POST['description'] : $existingData[0]->description;
+		$image = $existingData[0]->image;
+
+
+		if (isset($_FILES['image']) && $_FILES['image']['size'] > 0) {
+			$fileHandler = new File("assets/images/");
+			$fileName = @$_FILES['image']['name'];
+
+			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
+
+			if ($fileHandler->result && !empty($uploadedFiles)) {
+				$image = $this->generateUniqueFileName($fileName);
 			} else {
-				
-				$image = ""; 
-			}
-			$newData = [
-				"book_title" => $book_title,
-				"author" => $author,
-				"description" => $description,
-				"image" => $image
-			];
-			$called_id = [
-				'id'=> $id,
-			];
-
-			$updateResult = $this->bookModel->update($newData, $called_id);
-
-			if ($updateResult !== false) {
-				echo json_encode(["success" => true, "data" => $updateResult]);
-				return;
-			} else {
-				$error = $this->bookModel->getError();
+				$error = is_string($uploadedFiles) ? $uploadedFiles : "File upload failed";
 				echo json_encode(["success" => false, "error" => $error]);
+				return;
 			}
+		}
+
+		$newData = [
+			"book_title" => $book_title,
+			"author" => $author,
+			"description" => $description,
+			"image" => $image
+		];
+
+		$called_id = ['id' => $id];
+
+		$updateResult = $this->bookModel->update($newData, $called_id);
+
+		if ($updateResult !== false) {
+			echo json_encode(["success" => true, "data" => $updateResult]);
+			return;
 		} else {
-			$missingFields = [];
-
-			if (!isset($_POST['book_title'])) {
-				$missingFields[] = 'book_title';
-			}
-
-			if (!isset($_POST['author'])) {
-				$missingFields[] = 'author';
-			}
-
-			$error = "Missing required data in the request. Fields missing: " . implode(', ', $missingFields);
+			$error = $this->bookModel->getError();
 			echo json_encode(["success" => false, "error" => $error]);
 		}
 	}
+
 
 
 
