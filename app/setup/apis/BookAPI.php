@@ -187,12 +187,26 @@ class BookAPI extends Api
 
 
 
-	public function delete()
-	{
-		$this->json([
-			"message" => "You're now scrubbing something using " . $_SERVER["REQUEST_METHOD"] . " request"
-		]);
-	}
+	public function delete($bookId)
+{
+    
+
+	$booksToDelete = json_decode(json_encode($this->bookModel->deleteByBookId($bookId)), true);
+	$chapterModel = json_decode(json_encode($this->chapterModel->deleteChapter	($bookId)), true);
+	$sectionModel = json_decode(json_encode($this->sectionModel->deleteSection($bookId)), true);
+	$citationModel = json_decode(json_encode($this->citationModel->deleteCitation($bookId)), true);
+	$figureModel = json_decode(json_encode($this->figureModel->deleteFigure($bookId)), true);
+
+
+
+
+    if (empty($booksToDelete || $chapterModel || $sectionModel || $citationModel || $figureModel)) {
+        echo json_encode(["success" => false, "error" => "No books found with the specified identifier"]);
+        return;
+    }
+   
+    echo json_encode(["success" => true, "message" => "All books with the specified identifier deleted successfully"]);
+}
 
 	public function foobar()
 	{

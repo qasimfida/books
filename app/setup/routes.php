@@ -30,12 +30,13 @@
 	$routing->put("books/:id", "BookAPI::put");
 	$routing->get("books", "BookAPI::get");
 	$routing->get("books/:id", "BookAPI::getById");
+	$routing->delete("book/:id", "BookAPI::delete");
 
 	//chapter
 	$routing->post("chapter/:book_id", "ChapterAPI::post");
 	$routing->get("chapters", "ChapterAPI::get");
 	$routing->get("chapter/:book_id", "ChapterAPI::getById");
-
+	
 	
 	//section
 	$routing->post("book/:book_id/chapter/:chapter_id", "SectionAPI::post");
