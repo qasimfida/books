@@ -3,6 +3,10 @@
 	# Set up routes
 	$routing = new Routing();
 
+	require_once('Middleware.php');
+	Middleware::handle();
+
+
 	# Default
 	$routing->get("/", "TestAPI::get");
 
@@ -53,6 +57,14 @@
 	$routing->get("figures", "FigureAPI::get");
 	$routing->get("figures/:book_id", "FigureAPI::getById");
 
+
+
+
+	// Adding CORS headers to all routes
+	header("Access-Control-Allow-Origin: *");
+	header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+	header("Access-Control-Allow-Headers: Content-Type");
+	header("Access-Control-Allow-Credentials: true");
 
 
 ?>
