@@ -1,5 +1,6 @@
 <?php
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 /**
  * Test class
  */
@@ -96,13 +97,23 @@ class BookAPI extends Api
 			$book_title = $_POST['book_title'];
 			$author = $_POST['author'];
 			$description = isset($_POST['description']) ? $_POST['description'] : '';
-			$fileHandler = new File("assets/images/");
-			$fileName = @$_FILES['image']['name'];
+			// $fileHandler = new File("assets/images/");
+			// $fileName = @$_FILES['image']['name'];
+			$image = $_POST['image'];
 
+			if (strpos($image, 'data:image') !== false) {
 
-			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book", true);
-			if ($fileHandler->result && !empty($uploadedFiles)) {
-				$image = $this->generateUniqueFileName($fileName);
+			
+				$imageData = explode(',', $image);
+				$image = base64_decode($imageData[1]);
+
+				// Generate a unique file name
+				$fileName = $this->generateImageName("book_");
+
+				$filePath =  $fileName;
+				// Save the image to the specified path
+				file_put_contents($filePath, $image);
+				$image = $fileName;
 
 
 				if (!empty($image)) {
@@ -126,87 +137,105 @@ class BookAPI extends Api
 					echo json_encode(["success" => false, "error" => "Image file not uploaded or processed correctly"]);
 				}
 			} else {
-				$error = is_string($uploadedFiles) ? $uploadedFiles : "File upload failed";
-				echo json_encode(["success" => false, "error" => $error]);
+				// $error = is_string(imag) ? $uploadedFiles : "File upload failed";
+				echo json_encode(["success" => false, "error" => "File upload failed"]);
 			}
 		}
 	}
-
-
-	public function put($id)
+	public function generateImageName($originalName)
 	{
-		$existingData = $this->bookModel->getById($id);
+		$path = "assets/images/";
+		$date = date('YmdHis');
+		$uniqueName = "{$path}book_{$date}.jpg";
+		return $uniqueName;
+	}
 
-		if (!$existingData) {
-			echo json_encode(["success" => false, "error" => "Book not found"]);
-			return;
-		}
+	function base64_to_jpeg($base64_string, $output_file)
+	{
+		$ifp = fopen($output_file, 'wb');
+		$data = explode(',', $base64_string);
+		fwrite($ifp, base64_decode($data[1]));
+		fclose($ifp);
+		return $output_file;
+	}
 
+		public function put($id)
+		{
+			$existingData = $this->bookModel->getById($id);
 
-		$book_title = isset($_POST['book_title'])  && $_POST['book_title'] !== '' ? $_POST['book_title'] : $existingData[0]->book_title;
-		$author = isset($_POST['author'])  && $_POST['author'] !== '' ? $_POST['author'] : $existingData[0]->author;
-		$description = isset($_POST['description']) && $_POST['description'] !== '' ? $_POST['description'] : $existingData[0]->description;
-		$image = $existingData[0]->image;
-
-
-		if (isset($_FILES['image']) && $_FILES['image']['size'] > 0) {
-			$fileHandler = new File("assets/images/");
-			$fileName = @$_FILES['image']['name'];
-
-			$uploadedFiles = @$fileHandler->handle($_FILES['image'], "book_", true);
-
-			if ($fileHandler->result && !empty($uploadedFiles)) {
-				$image = $this->generateUniqueFileName($fileName);
-			} else {
-				$error = is_string($uploadedFiles) ? $uploadedFiles : "File upload failed";
-				echo json_encode(["success" => false, "error" => $error]);
+			if (!$existingData) {
+				echo json_encode(["success" => false, "error" => "Book not found"]);
 				return;
 			}
+
+			$book_title = isset($_POST['book_title']) && $_POST['book_title'] !== '' ? $_POST['book_title'] : $existingData[0]->book_title;
+			$author = isset($_POST['author']) && $_POST['author'] !== '' ? $_POST['author'] : $existingData[0]->author;
+			$description = isset($_POST['description']) && $_POST['description'] !== '' ? $_POST['description'] : $existingData[0]->description;
+			$image = $_POST['image'];
+
+			// Check if the image is in base64 format
+			if (strpos($image, 'data:image') !== false) {
+				$imageData = explode(',', $image);
+				$image = base64_decode($imageData[1]);
+
+				// Generate a unique file name
+				$fileName = $this->generateImageName("book_");
+
+				$filePath =  $fileName;
+				// Save the image to the specified path
+				file_put_contents($filePath, $image);
+				$image = $fileName;
+			} else {
+				// If the image is not in base64 format, use the existing value
+				$image = $existingData[0]->image;
+			}
+
+			$newData = [
+				"book_title" => $book_title,
+				"author" => $author,
+				"description" => $description,
+				"image" => $image
+			];
+
+			$called_id = ['id' => $id];
+
+			$updateResult = $this->bookModel->update($newData, $called_id);
+
+			if ($updateResult !== false) {
+				echo json_encode(["success" => true, "data" => $updateResult]);
+				return;
+			} else {
+				$error = $this->bookModel->getError();
+				echo json_encode(["success" => false, "error" => $error]);
+			}
 		}
 
-		$newData = [
-			"book_title" => $book_title,
-			"author" => $author,
-			"description" => $description,
-			"image" => $image
-		];
 
-		$called_id = ['id' => $id];
 
-		$updateResult = $this->bookModel->update($newData, $called_id);
-
-		if ($updateResult !== false) {
-			echo json_encode(["success" => true, "data" => $updateResult]);
-			return;
-		} else {
-			$error = $this->bookModel->getError();
-			echo json_encode(["success" => false, "error" => $error]);
-		}
-	}
 
 
 
 
 	public function delete($bookId)
-{
-    
-
-	$booksToDelete = json_decode(json_encode($this->bookModel->deleteByBookId($bookId)), true);
-	$chapterModel = json_decode(json_encode($this->chapterModel->deleteChapter	($bookId)), true);
-	$sectionModel = json_decode(json_encode($this->sectionModel->deleteSection($bookId)), true);
-	$citationModel = json_decode(json_encode($this->citationModel->deleteCitation($bookId)), true);
-	$figureModel = json_decode(json_encode($this->figureModel->deleteFigure($bookId)), true);
+	{
 
 
+		$booksToDelete = json_decode(json_encode($this->bookModel->deleteByBookId($bookId)), true);
+		$chapterModel = json_decode(json_encode($this->chapterModel->deleteChapter($bookId)), true);
+		$sectionModel = json_decode(json_encode($this->sectionModel->deleteSection($bookId)), true);
+		$citationModel = json_decode(json_encode($this->citationModel->deleteCitation($bookId)), true);
+		$figureModel = json_decode(json_encode($this->figureModel->deleteFigure($bookId)), true);
 
 
-    if (empty($booksToDelete || $chapterModel || $sectionModel || $citationModel || $figureModel)) {
-        echo json_encode(["success" => false, "error" => "No books found with the specified identifier"]);
-        return;
-    }
-   
-    echo json_encode(["success" => true, "message" => "All books with the specified identifier deleted successfully"]);
-}
+
+
+		if (empty($booksToDelete || $chapterModel || $sectionModel || $citationModel || $figureModel)) {
+			echo json_encode(["success" => false, "error" => "No books found with the specified identifier"]);
+			return;
+		}
+
+		echo json_encode(["success" => true, "message" => "All books with the specified identifier deleted successfully"]);
+	}
 
 	public function foobar()
 	{
