@@ -1,5 +1,6 @@
 <?php
-
+error_reporting(0);  
+ini_set('display_errors', 0); 
 	/***
 	 * NAP - Vanilla PHP REST-API Boilerplate
 	 * https://github.com/frozeeen/Nap-PHP
