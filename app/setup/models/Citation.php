@@ -12,9 +12,10 @@ class Citation extends Model
 	public function getCitation($data)
 	{
 
-		$bookId = isset($data['id']) ? $data['id'] :  $data['book_id'];
+		$bookId = isset($data['id']) ? $data['id'] : $data['citation_id'];
+		$columnToSearch = isset($data['id']) ? 'book_id' : 'id';
 
-		$sql = "SELECT * FROM " . $this->table_name . " WHERE book_id = :book_id";
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :book_id";
 
 		$this->query($sql);
 

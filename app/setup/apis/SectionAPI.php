@@ -27,28 +27,14 @@
 			}
 		}
 		
-		public function getById($bookId)
+		public function getById($id)
 		{
-		
-			$book = json_decode(json_encode($this->sectionModel->getSection($bookId)), false);
+			$book = json_decode(json_encode($this->sectionModel->getSection($id)), true);
 			
-	
 			if ($book !== false) {
-				// Combine both data sets into a single array
-				$combinedChapters = [];
-	
-				// Combine all data into a single array
-				$combinedData = [
-					"sections" => $book,
-				];
-	
-				// Return the combined data as JSON
 				header('Content-Type: application/json');
-				echo json_encode(["success" => true, "data" => $combinedData]);
+				echo json_encode(["success" => true, "data" => $book]);
 			} else {
-				// If either the book or chapter is not found, return an error
-				// $error = $book !== false ? $this->bookModel->getError() : $this->chapterModel->getError();
-	
 				header('Content-Type: application/json');
 				echo json_encode(["success" => false, "error" => "error"]);
 			}
@@ -61,7 +47,6 @@
             } elseif (is_object($request) && method_exists($request, 'getParam')) {
                 $chapter_id = $request->getParam('chapter_id');
 				$book_id = $request->getParam('book_id');
-
             }
 
 			if(isset($_POST['section_title'])) {

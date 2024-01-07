@@ -11,10 +11,10 @@ class Section extends Model
 
 	public function getSection($data)
 	{
+		$bookId = isset($data['id']) ? $data['id'] : $data['section_id'];
+		$columnToSearch = isset($data['id']) ? 'book_id' : 'id';
 
-		$bookId = isset($data['id']) ? $data['id'] : $data['book_id'];
-
-		$sql = "SELECT * FROM " . $this->table_name . " WHERE book_id = :book_id";
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :book_id";
 
 		$this->query($sql);
 

@@ -34,29 +34,15 @@ class CitationAPI extends Api
 			echo json_encode(["success" => false, "error" => $error]);
 		}
 	}
-	
+
 	public function getById($bookId)
 	{
-	
 		$book = json_decode(json_encode($this->citationModal->getCitation($bookId)), false);
-		
 
 		if ($book !== false) {
-			// Combine both data sets into a single array
-			$combinedChapters = [];
-
-			// Combine all data into a single array
-			$combinedData = [
-				"citations" => $book,
-			];
-
-			// Return the combined data as JSON
 			header('Content-Type: application/json');
-			echo json_encode(["success" => true, "data" => $combinedData]);
+			echo json_encode(["success" => true, "data" => $book]);
 		} else {
-			// If either the book or chapter is not found, return an error
-			// $error = $book !== false ? $this->bookModel->getError() : $this->chapterModel->getError();
-
 			header('Content-Type: application/json');
 			echo json_encode(["success" => false, "error" => "error"]);
 		}
@@ -65,30 +51,30 @@ class CitationAPI extends Api
 
 
 
-	public function post($request){
+	public function post($request)
+	{
 		if (is_array($request)) {
 			$book_id = $request['book_id'];
 		}
 
-		if(isset($_POST['citation_name']) && isset($_POST['citation_id'])) {
-			
+		if (isset($_POST['citation_name']) && isset($_POST['citation_id'])) {
+
 			$citation_name = $_POST['citation_name'];
 			$citation_id = $_POST['citation_id'];
-			
+
 			$result = $this->citationModal->insert([
 				"citation_name" => $citation_name,
 				"citation_id" => $citation_id,
 				"book_id" => $book_id
 
 			]);
-	
+
 			header('Content-Type: application/json');
-	
+
 			if ($result !== false) {
 				echo json_encode(["success" => true, "data" => $result]);
 			} else {
 				echo json_encode(["failed" => false, "error" => " 'citation_id' or 'citation_name' in the request"]);
-
 			}
 		} else {
 			echo json_encode(["success" => false, "error" => "Missing 'citation_id' or 'citation_name' in the request"]);

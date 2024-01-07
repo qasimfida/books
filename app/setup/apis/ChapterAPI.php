@@ -16,13 +16,10 @@
 			// Check if book_id is set in the request
 			$books = $this->chapterModel->selectAll();
 	
-			// Check if any books were found
 			if ($books !== false) {
-				// Return the books as JSON
 				header('Content-Type: application/json');
 				echo json_encode(["success" => true, "data" => $books]);
 			} else {
-				// If no books found, return an error
 				$error = $this->chapterModel->getError();
 				header('Content-Type: application/json');
 				echo json_encode(["success" => false, "error" => $error]);
@@ -31,11 +28,16 @@
 		public function getById($bookId)
 		{
 					
-			$chaptersById = json_decode(json_encode($this->chapterModel->getChapter($bookId)), true);
-				// Return the combined data as JSON
-				header('Content-Type: application/json');
-				echo json_encode(["success" => true, "data" => $chaptersById]);
 				
+			$chaptersById = json_decode(json_encode($this->chapterModel->getChapter($bookId)), true);
+			
+			if ($chaptersById !== false) {
+					header('Content-Type: application/json');
+					echo json_encode(["success" => true, "data" => $chaptersById]);
+			} else {
+					header('Content-Type: application/json');
+					echo json_encode(["success" => false, "error" => "error"]);
+			}	
 
 		
 		}
