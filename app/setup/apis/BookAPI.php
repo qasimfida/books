@@ -103,7 +103,7 @@ class BookAPI extends Api
 
 			if (strpos($image, 'data:image') !== false) {
 
-			
+
 				$imageData = explode(',', $image);
 				$image = base64_decode($imageData[1]);
 
@@ -159,88 +159,100 @@ class BookAPI extends Api
 		return $output_file;
 	}
 
-		public function put($id)
-		{
-			$existingData = $this->bookModel->getById($id);
+	public function put($id)
+	{
+		$existingData = $this->bookModel->getById($id);
 
-			if (!$existingData) {
-				echo json_encode(["success" => false, "error" => "Book not found"]);
-				return;
-			}
+		if (!$existingData) {
+			echo json_encode(["success" => false, "error" => "Book not found"]);
+			return;
+		}
 
-			$book_title = isset($_POST['book_title']) && $_POST['book_title'] !== '' ? $_POST['book_title'] : $existingData[0]->book_title;
-			$author = isset($_POST['author']) && $_POST['author'] !== '' ? $_POST['author'] : $existingData[0]->author;
-			$description = isset($_POST['description']) && $_POST['description'] !== '' ? $_POST['description'] : $existingData[0]->description;
-			$image = $_POST['image'];
+		$book_title = isset($_POST['book_title']) && $_POST['book_title'] !== '' ? $_POST['book_title'] : $existingData[0]->book_title;
+		$author = isset($_POST['author']) && $_POST['author'] !== '' ? $_POST['author'] : $existingData[0]->author;
+		$description = isset($_POST['description']) && $_POST['description'] !== '' ? $_POST['description'] : $existingData[0]->description;
+		$image = $_POST['image'];
 
-			// Check if the image is in base64 format
-			if (strpos($image, 'data:image') !== false) {
-				$imageData = explode(',', $image);
-				$image = base64_decode($imageData[1]);
+		// Check if the image is in base64 format
+		if (strpos($image, 'data:image') !== false) {
+			$imageData = explode(',', $image);
+			$image = base64_decode($imageData[1]);
 
-				// Generate a unique file name
-				$fileName = $this->generateImageName("book_");
+			// Generate a unique file name
+			$fileName = $this->generateImageName("book_");
 
-				$filePath =  $fileName;
-				// Save the image to the specified path
-				file_put_contents($filePath, $image);
-				$image = $fileName;
-			} else {
-				// If the image is not in base64 format, use the existing value
-				$image = $existingData[0]->image;
-			}
+			$filePath =  $fileName;
+			// Save the image to the specified path
+			file_put_contents($filePath, $image);
+			$image = $fileName;
+		} else {
+			// If the image is not in base64 format, use the existing value
+			$image = $existingData[0]->image;
+		}
 
-			$newData = [
-				"book_title" => $book_title,
-				"author" => $author,
-				"description" => $description,
-				"image" => $image
-			];
+		$newData = [
+			"book_title" => $book_title,
+			"author" => $author,
+			"description" => $description,
+			"image" => $image
+		];
 
-			$called_id = ['id' => $id];
+		$called_id = ['id' => $id];
 
+		try {
 			$updateResult = $this->bookModel->update($newData, $called_id);
 
 			if ($updateResult !== false) {
 				echo json_encode(["success" => true, "data" => $updateResult]);
-				return;
 			} else {
-				$error = $this->bookModel->getError();
+				$error = $this->figureModel->getError();
 				echo json_encode(["success" => false, "error" => $error]);
 			}
+		} catch (Exception $e) {
+			echo json_encode(["success" => false, "error" => $e->getMessage()]);
 		}
-
-
-
-
+	}
 
 
 
 	public function delete($bookId)
 	{
+		// Delete records from different models
+		$booksToDelete = $this->bookModel->deleteByBookId($bookId);
+		$chapterModel = $this->chapterModel->deleteChapter($bookId);
+		$sectionModel = $this->sectionModel->deleteSection($bookId);
+		$citationModel = $this->citationModel->deleteCitation($bookId);
+		$figureModel = $this->figureModel->deleteFigure($bookId);
 
-
-		$booksToDelete = json_decode(json_encode($this->bookModel->deleteByBookId($bookId)), true);
-		$chapterModel = json_decode(json_encode($this->chapterModel->deleteChapter($bookId)), true);
-		$sectionModel = json_decode(json_encode($this->sectionModel->deleteSection($bookId)), true);
-		$citationModel = json_decode(json_encode($this->citationModel->deleteCitation($bookId)), true);
-		$figureModel = json_decode(json_encode($this->figureModel->deleteFigure($bookId)), true);
-
-
-
-
-		if (empty($booksToDelete || $chapterModel || $sectionModel || $citationModel || $figureModel)) {
+		// Check if any records were deleted
+		if (empty($booksToDelete) && empty($chapterModel) && empty($sectionModel) && empty($citationModel) && empty($figureModel)) {
 			echo json_encode(["success" => false, "error" => "No books found with the specified identifier"]);
 			return;
 		}
 
-		echo json_encode(["success" => true, "message" => "All books with the specified identifier deleted successfully"]);
-	}
+		// Get the book details by ID
+		$getBook = $this->bookModel->getById($bookId);
 
-	public function foobar()
-	{
-		$this->json([
-			"message" => "You're now accessing this method by DEFINED_METHOD."
-		]);
+		// Check if the book exists
+		if (!empty($getBook)) {
+			// Get the image name from the book details
+			$image = $getBook[0]->image;
+
+			// Construct the full path to the image file
+			$filePath = $image;
+
+			// Check if the file exists before attempting to delete
+			if (file_exists($filePath)) {
+				// Attempt to delete the file
+				if (unlink($filePath)) {
+					echo json_encode(["success" => true, "message" => "Image file deleted successfully"]);
+				} else {
+					echo json_encode(["success" => false, "error" => "Failed to delete image file"]);
+				}
+			}
+		}
+
+		// Indicate successful deletion of all records
+		echo json_encode(["success" => true, "message" => "All books with the specified identifier deleted successfully"]);
 	}
 }

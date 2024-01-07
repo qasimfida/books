@@ -125,7 +125,6 @@ class Model extends Database
 	 */
 	public function update($data = null, $where = [])
 	{
-
 		# Replace with passed updating data if exist
 		$data = $data ? (object)$data : (object)$this->data;
 

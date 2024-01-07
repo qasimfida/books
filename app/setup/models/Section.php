@@ -25,6 +25,18 @@ class Section extends Model
 
 		return $this->data;
 	}
+	public function getSectionById($sectionId)
+	{
+		$sectionId = isset($sectionId['id']) ? $sectionId['id'] : "";	
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+		$this->query($sql);
+		$this->bind("id", $sectionId);
+		$this->data = $this->resultSet();
+		$this->exist = ($this->rowCount() > 0);
+
+		return $this->data;
+	}
+	
 	public function deleteSection($data)
 	{
 		$bookId = isset($data['id']) ? $data['id'] : $data['book_id'];

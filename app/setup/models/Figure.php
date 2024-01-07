@@ -22,6 +22,19 @@
 		
 			return $this->data;
 		}
+		public function getFigureById($figureId)
+	{
+		$figureId = isset($figureId['id']) ? $figureId['id'] : "";	
+		
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+		$this->query($sql);
+		$this->bind("id", $figureId);
+		$this->data = $this->resultSet();
+		$this->exist = ($this->rowCount() > 0);
+
+		return $this->data;
+	}
+	
 		public function deleteFigure($data)
 		{
 

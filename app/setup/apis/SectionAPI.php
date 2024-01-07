@@ -77,23 +77,65 @@
 		}
 		
 
-		public function put(){
-			$this->json([
-				"message" => "Updating something using " . $_SERVER['REQUEST_METHOD'] . " request?",
-				"request" => $this->request
-			]);
+		public function put($id)
+		{
+		
+			$getSections = $this->sectionModel->getSectionById($id);
+			if (!$getSections) {
+				echo json_encode(["success" => false, "error" => "Book not found"]);
+				return;
+			}
+
+			$section_title = isset($_POST['section_title']) && $_POST['section_title'] !== '' ? $_POST['section_title'] : $getSections[0]->section_title;
+			$content = isset($_POST['content']) && $_POST['content'] !== '' ? $_POST['content'] : $getSections[0]->content;
+
+			
+			$newData = [
+				"section_title" => $section_title,
+				"content" => $content,
+
+			];
+
+			$called_id = ['id' => $id];
+		
+			try {
+				$updateResult = $this->sectionModel->update($newData, $called_id);
+		
+				if ($updateResult !== false) {
+					echo json_encode(["success" => true, "data" => $updateResult]);
+				} else {
+					$error = $this->sectionModel->getError();
+					echo json_encode(["success" => false, "error" => $error]);
+				}
+			} catch (Exception $e) {
+				echo json_encode(["success" => false, "error" => $e->getMessage()]);
+			}
 		}
 
-		public function delete(){
-			$this->json([
-				"message" => "You're now scrubbing something using " . $_SERVER["REQUEST_METHOD"] . " request"
-			]);
-		}
-
-		public function foobar(){
-			$this->json([
-				"message" => "You're now accessing this method by DEFINED_METHOD."
-			]);
+		public function delete($bookId)
+		{
+			$getSection = json_decode(json_encode($this->sectionModel->getCitationById($bookId)), true);
+	
+			if (empty($getSection)) {
+				echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
+				return;
+			}
+					
+			try {
+				$updateResult = $this->sectionModel->delete($bookId); // Pass the condition here
+	
+				var_dump($updateResult);
+				if ($updateResult !== false) {
+					echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
+				} else {
+					$error = $this->sectionModel->getError();
+					echo json_encode(["success" => false, "error" => $error]);
+				}
+			} catch (Exception $e) {
+				echo json_encode(["success" => false, "error" => $e->getMessage()]);
+			}
+	
+		
 		}
 
 	}

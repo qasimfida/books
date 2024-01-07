@@ -5,13 +5,13 @@
  */
 class CitationAPI extends Api
 {
-	private $citationModal;
+	private $citationModel;
 	private $bookModel;
 	private $chapterModel;
 	private $sectionModel;
 	function __construct()
 	{
-		$this->citationModal = $this->model("Citation");
+		$this->citationModel = $this->model("Citation");
 		$this->bookModel = $this->model("Book");
 		$this->chapterModel = $this->model("Chapter");
 		$this->sectionModel = $this->model("Section");
@@ -19,7 +19,7 @@ class CitationAPI extends Api
 	public function get()
 	{
 		// Check if book_id is set in the request
-		$books = $this->citationModal->selectAll();
+		$books = $this->citationModel->selectAll();
 
 
 		// Check if any books were found
@@ -29,7 +29,7 @@ class CitationAPI extends Api
 			echo json_encode(["success" => true, "data" => $books]);
 		} else {
 			// If no books found, return an error
-			$error = $this->citationModal->getError();
+			$error = $this->citationModel->getError();
 			header('Content-Type: application/json');
 			echo json_encode(["success" => false, "error" => $error]);
 		}
@@ -37,7 +37,7 @@ class CitationAPI extends Api
 
 	public function getById($bookId)
 	{
-		$book = json_decode(json_encode($this->citationModal->getCitation($bookId)), false);
+		$book = json_decode(json_encode($this->citationModel->getCitation($bookId)), false);
 
 		if ($book !== false) {
 			header('Content-Type: application/json');
@@ -62,7 +62,7 @@ class CitationAPI extends Api
 			$citation_name = $_POST['citation_name'];
 			$citation_id = $_POST['citation_id'];
 
-			$result = $this->citationModal->insert([
+			$result = $this->citationModel->insert([
 				"citation_name" => $citation_name,
 				"citation_id" => $citation_id,
 				"book_id" => $book_id
@@ -82,25 +82,64 @@ class CitationAPI extends Api
 	}
 
 
-	public function put()
+	public function put($id)
 	{
-		$this->json([
-			"message" => "Updating something using " . $_SERVER['REQUEST_METHOD'] . " request?",
-			"request" => $this->request
-		]);
+
+		$getSections = $this->citationModel->getCitationById($id);
+		if (!$getSections) {
+			echo json_encode(["success" => false, "error" => "Book not found"]);
+			return;
+		}
+
+		$citation_name = isset($_POST['citation_name']) && $_POST['citation_name'] !== '' ? $_POST['citation_name'] : $getSections[0]->citation_name;
+		$citation_id = isset($_POST['citation_id']) && $_POST['citation_id'] !== '' ? $_POST['citation_id'] : $getSections[0]->citation_id;
+
+
+		$newData = [
+			"citation_name" => $citation_name,
+			"citation_id" => $citation_id,
+
+		];
+
+		$called_id = ['id' => $id];
+
+		try {
+			$updateResult = $this->citationModel->update($newData, $called_id);
+
+			if ($updateResult !== false) {
+				echo json_encode(["success" => true, "data" => $updateResult]);
+			} else {
+				$error = $this->citationModel->getError();
+				echo json_encode(["success" => false, "error" => $error]);
+			}
+		} catch (Exception $e) {
+			echo json_encode(["success" => false, "error" => $e->getMessage()]);
+		}
 	}
 
-	public function delete()
+	public function delete($bookId)
 	{
-		$this->json([
-			"message" => "You're now scrubbing something using " . $_SERVER["REQUEST_METHOD"] . " request"
-		]);
-	}
+		$getCitation = json_decode(json_encode($this->citationModel->getCitationById($bookId)), true);
 
-	public function foobar()
-	{
-		$this->json([
-			"message" => "You're now accessing this method by DEFINED_METHOD."
-		]);
+		if (empty($getCitation)) {
+			echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
+			return;
+		}
+				
+		try {
+			$updateResult = $this->citationModel->delete($bookId); // Pass the condition here
+
+			var_dump($updateResult);
+			if ($updateResult !== false) {
+				echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
+			} else {
+				$error = $this->citationModel->getError();
+				echo json_encode(["success" => false, "error" => $error]);
+			}
+		} catch (Exception $e) {
+			echo json_encode(["success" => false, "error" => $e->getMessage()]);
+		}
+
+	
 	}
 }

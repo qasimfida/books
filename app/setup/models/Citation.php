@@ -26,6 +26,19 @@ class Citation extends Model
 
 		return $this->data;
 	}
+	public function getCitationById($citationId)
+	{
+		$citationId = isset($citationId['id']) ? $citationId['id'] : "";	
+		
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+		$this->query($sql);
+		$this->bind("id", $citationId);
+		$this->data = $this->resultSet();
+		$this->exist = ($this->rowCount() > 0);
+
+		return $this->data;
+	}
+	
 	public function deleteCitation($data)
 	{
 		$bookId = isset($data['id']) ? $data['id'] : $data['book_id'];
