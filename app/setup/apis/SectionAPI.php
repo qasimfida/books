@@ -114,7 +114,7 @@
 
 		public function delete($bookId)
 		{
-			$getSection = json_decode(json_encode($this->sectionModel->getCitationById($bookId)), true);
+			$getSection = json_decode(json_encode($this->sectionModel->getSectionById($bookId)), true);
 	
 			if (empty($getSection)) {
 				echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
@@ -124,7 +124,6 @@
 			try {
 				$updateResult = $this->sectionModel->delete($bookId); // Pass the condition here
 	
-				var_dump($updateResult);
 				if ($updateResult !== false) {
 					echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
 				} else {
@@ -137,6 +136,7 @@
 	
 		
 		}
+		
 
 	}
 

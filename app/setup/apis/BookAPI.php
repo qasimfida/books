@@ -99,6 +99,7 @@ class BookAPI extends Api
 			$description = isset($_POST['description']) ? $_POST['description'] : '';
 			// $fileHandler = new File("assets/images/");
 			// $fileName = @$_FILES['image']['name'];
+			
 			$image = $_POST['image'];
 
 			if (strpos($image, 'data:image') !== false) {
@@ -172,7 +173,8 @@ class BookAPI extends Api
 		$author = isset($_POST['author']) && $_POST['author'] !== '' ? $_POST['author'] : $existingData[0]->author;
 		$description = isset($_POST['description']) && $_POST['description'] !== '' ? $_POST['description'] : $existingData[0]->description;
 
-		if(isset($_POST['image'])){
+		if(isset($_POST['image'])){	
+			// var_dump($_POST['image']);
 			$filePath =  $existingData[0]->image;
 				if (file_exists($filePath)) {
 				   unlink($filePath);  
@@ -181,6 +183,7 @@ class BookAPI extends Api
 		}else{
 			$image = $existingData[0]->image;
 		}
+		var_dump($_POST['image']);
 
 		// Check if the image is in base64 format
 		if (strpos($image, 'data:image') !== false) {

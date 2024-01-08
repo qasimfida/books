@@ -108,7 +108,7 @@ class ChapterAPI extends Api
 
 	public function delete($bookId)
 	{
-		$getChapter = json_decode(json_encode($this->chapterModel->getCitationById($bookId)), true);
+		$getChapter = json_decode(json_encode($this->chapterModel->getChapterById($bookId)), true);
 
 		if (empty($getChapter)) {
 			echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
@@ -118,7 +118,6 @@ class ChapterAPI extends Api
 		try {
 			$updateResult = $this->chapterModel->delete($bookId); // Pass the condition here
 
-			var_dump($updateResult);
 			if ($updateResult !== false) {
 				echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
 			} else {

@@ -34,7 +34,7 @@ $routing->get("sections/:id", "SectionAPI::getById");
 $routing->get("sections", "SectionAPI::get");
 $routing->get("section/:section_id", "SectionAPI::getById");
 $routing->put("section/:id", "SectionAPI::put");
-$routing->delete("/:id", "SectionAPI::delete");
+$routing->delete("section/:id", "SectionAPI::delete");
 
 //citation
 $routing->post("citation/:book_id", "CitationAPI::post");

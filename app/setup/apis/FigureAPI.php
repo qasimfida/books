@@ -100,7 +100,7 @@ class FigureAPI extends Api
 		}
 		public function delete($bookId)
 	{
-		$getFigure = json_decode(json_encode($this->figureModel->getCitationById($bookId)), true);
+		$getFigure = json_decode(json_encode($this->figureModel->getFigureById($bookId)), true);
 
 		if (empty($getFigure)) {
 			echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
@@ -110,7 +110,6 @@ class FigureAPI extends Api
 		try {
 			$updateResult = $this->figureModel->delete($bookId); // Pass the condition here
 
-			var_dump($updateResult);
 			if ($updateResult !== false) {
 				echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
 			} else {
