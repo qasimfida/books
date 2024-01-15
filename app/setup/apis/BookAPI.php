@@ -183,7 +183,6 @@ class BookAPI extends Api
 		}else{
 			$image = $existingData[0]->image;
 		}
-		var_dump($_POST['image']);
 
 		// Check if the image is in base64 format
 		if (strpos($image, 'data:image') !== false) {

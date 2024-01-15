@@ -82,40 +82,40 @@ class CitationAPI extends Api
 	}
 
 
-	public function put($id)
-	{
+	// public function put($id)
+	// {
 
-		$getSections = $this->citationModel->getCitationById($id);
-		if (!$getSections) {
-			echo json_encode(["success" => false, "error" => "Book not found"]);
-			return;
-		}
+	// 	$getSections = $this->citationModel->getCitationById($id);
+	// 	if (!$getSections) {
+	// 		echo json_encode(["success" => false, "error" => "Book not found"]);
+	// 		return;
+	// 	}
 
-		$citation_name = isset($_POST['citation_name']) && $_POST['citation_name'] !== '' ? $_POST['citation_name'] : $getSections[0]->citation_name;
-		$citation_id = isset($_POST['citation_id']) && $_POST['citation_id'] !== '' ? $_POST['citation_id'] : $getSections[0]->citation_id;
+	// 	$citation_name = isset($_POST['citation_name']) && $_POST['citation_name'] !== '' ? $_POST['citation_name'] : $getSections[0]->citation_name;
+	// 	$citation_id = isset($_POST['citation_id']) && $_POST['citation_id'] !== '' ? $_POST['citation_id'] : $getSections[0]->citation_id;
 
 
-		$newData = [
-			"citation_name" => $citation_name,
-			"citation_id" => $citation_id,
+	// 	$newData = [
+	// 		"citation_name" => $citation_name,
+	// 		"citation_id" => $citation_id,
 
-		];
+	// 	];
 
-		$called_id = ['id' => $id];
+	// 	$called_id = ['id' => $id];
 
-		try {
-			$updateResult = $this->citationModel->update($newData, $called_id);
+	// 	try {
+	// 		$updateResult = $this->citationModel->update($newData, $called_id);
 
-			if ($updateResult !== false) {
-				echo json_encode(["success" => true, "data" => $updateResult]);
-			} else {
-				$error = $this->citationModel->getError();
-				echo json_encode(["success" => false, "error" => $error]);
-			}
-		} catch (Exception $e) {
-			echo json_encode(["success" => false, "error" => $e->getMessage()]);
-		}
-	}
+	// 		if ($updateResult !== false) {
+	// 			echo json_encode(["success" => true, "data" => $updateResult]);
+	// 		} else {
+	// 			$error = $this->citationModel->getError();
+	// 			echo json_encode(["success" => false, "error" => $error]);
+	// 		}
+	// 	} catch (Exception $e) {
+	// 		echo json_encode(["success" => false, "error" => $e->getMessage()]);
+	// 	}
+	// }
 
 	public function delete($bookId)
 	{
@@ -141,5 +141,35 @@ class CitationAPI extends Api
 		}
 
 	
+	}
+	public function put($id)
+	{
+		$getCitation = $this->citationModel->getCitationById($id);
+
+		if (!$getCitation) {
+			echo json_encode(["success" => false, "error" => "Citation not found"]);
+			return;
+		}
+		$name = isset($_POST['citation_name']) && $_POST['citation_name'] !== '' ? $_POST['citation_name'] : $getCitation[0]->citation_name;
+
+
+		$newData = [
+			"citation_name" => $name,
+			"citation_id" => $id,
+		];
+
+		
+		try{
+			$updateResult = $this->citationModel->updateCitation($newData, $id);
+			if ($updateResult !== false) {
+				echo json_encode(["success" => true, "data" => $updateResult]);
+			} else {
+				$error = $this->citationModel->getError();
+				echo json_encode(["success" => false, "error" => $error]);
+			}
+		} catch (Exception $e) {
+			echo json_encode(["success" => false, "error" => $e->getMessage()]);
+		}
+		
 	}
 }

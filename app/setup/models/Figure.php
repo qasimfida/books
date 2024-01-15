@@ -17,16 +17,18 @@
 			$this->query($sql);
 			$this->bind("book_id", $bookId);
 		
+			
 			$this->data = $this->resultSet();
 			$this->exist = ($this->rowCount() > 0);
-		
+			
 			return $this->data;
 		}
 		public function getFigureById($figureId)
 	{
-		$figureId = $figureId['figure_id'] ;
-		
-		$sql = "SELECT * FROM " . $this->table_name . " WHERE figure_id = :figure_id";
+		$figureId = isset($figureId['id']) ? $figureId['id'] : $figureId['figure_id'];	
+		$columnToSearch = isset($data['id']) ? 'id' : 'figure_id';
+
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :figure_id";
 		$this->query($sql);
 		$this->bind("figure_id", $figureId);
 		$this->data = $this->resultSet();
@@ -48,6 +50,25 @@
 			$this->bind("book_id", $bookId);
 		
 			$this->data = $this->resultSet();
+			$this->exist = ($this->rowCount() > 0);
+		
+			return $this->data;
+		}
+		public function updateFigure($data, $figure_id){
+			
+			$figureId = $figure_id['figure_id'];
+
+			$sql = "UPDATE " . $this->table_name . " SET figure_name = :figure_name, figure_image = :figure_image WHERE figure_id = :figure_id";
+		
+			$this->query($sql);
+		
+			$this->bind(":figure_name", $data['figure_name']);
+			$this->bind(":figure_image", $data['figure_image']);
+			$this->bind(":figure_id", $figureId);
+		
+			$this->execute();
+		
+			$this->data = $this->getFigureById($figure_id);
 			$this->exist = ($this->rowCount() > 0);
 		
 			return $this->data;

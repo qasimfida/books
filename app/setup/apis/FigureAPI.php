@@ -45,10 +45,13 @@ class FigureAPI extends Api
 		if (isset($_POST['figure_id'])) {
 			$figure_name = $_POST['figure_name'];
 			$figure_id = $_POST['figure_id'];
+			$image = $_POST['image'];
+
 			$result = $this->figureModel->insert([
 				"figure_name" => $figure_name,
 				"figure_id" => $figure_id,
-				"book_id" => $book_id
+				"book_id" => $book_id,
+				"figure_image" => $image
 			]);
 
 			header('Content-Type: application/json');
@@ -64,42 +67,41 @@ class FigureAPI extends Api
 			echo json_encode(["success" => false, "error" => "Figure Id not defined"]);
 		}
 	}
+	
 	public function put($id)
-		{
-		
-			$getSections = $this->figureModel->getFigureById($id);
-			var_dump($getSections);
-			if (!$getSections) {
-				echo json_encode(["success" => false, "error" => "Figure not found"]);
-				return;
-			}
+	{
+		$getFigure = $this->figureModel->getFigureById($id);
 
-			$figure_name = isset($_POST['figure_name']) && $_POST['figure_name'] !== '' ? $_POST['figure_name'] : $getSections[0]->figure_name;
-			$figure_id = isset($_POST['figure_id']) && $_POST['figure_id'] !== '' ? $_POST['figure_id'] : $getSections[0]->figure_id;
-
-			
-			$newData = [
-				"figure_name" => $figure_name,
-				"figure_id" => $figure_id,
-
-			];
-
-			$called_id = ['id' => $id];
-		
-			try {
-				$updateResult = $this->figureModel->update($newData, $called_id);
-		
-				if ($updateResult !== false) {
-					echo json_encode(["success" => true, "data" => $updateResult]);
-				} else {
-					$error = $this->figureModel->getError();
-					echo json_encode(["success" => false, "error" => $error]);
-				}
-			} catch (Exception $e) {
-				echo json_encode(["success" => false, "error" => $e->getMessage()]);
-			}
+		if (!$getFigure) {
+			echo json_encode(["success" => false, "error" => "Figure not found"]);
+			return;
 		}
-		public function delete($bookId)
+		$name = isset($_POST['figure_name']) && $_POST['figure_name'] !== '' ? $_POST['figure_name'] : $getFigure[0]->figure_name;
+		$image = isset($_POST['figure_image']) && $_POST['figure_image'] !== '' ? $_POST['figure_image'] : $getFigure[0]->figure_image;
+
+
+		$newData = [
+			"figure_name" => $name,
+			"figure_image" => $image,
+			"figure_id" => $id,
+		];
+
+		
+		try{
+			$updateResult = $this->figureModel->updateFigure($newData, $id);
+			if ($updateResult !== false) {
+				echo json_encode(["success" => true, "data" => $updateResult]);
+			} else {
+				$error = $this->figureModel->getError();
+				echo json_encode(["success" => false, "error" => $error]);
+			}
+		} catch (Exception $e) {
+			echo json_encode(["success" => false, "error" => $e->getMessage()]);
+		}
+		
+	}
+
+	public function delete($bookId)
 	{
 		$getFigure = json_decode(json_encode($this->figureModel->getFigureById($bookId)), true);
 
@@ -107,7 +109,7 @@ class FigureAPI extends Api
 			echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
 			return;
 		}
-				
+
 		try {
 			$updateResult = $this->figureModel->delete($bookId); // Pass the condition here
 
@@ -120,7 +122,5 @@ class FigureAPI extends Api
 		} catch (Exception $e) {
 			echo json_encode(["success" => false, "error" => $e->getMessage()]);
 		}
-
-	
 	}
 }

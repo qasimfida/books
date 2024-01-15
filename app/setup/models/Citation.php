@@ -28,9 +28,10 @@ class Citation extends Model
 	}
 	public function getCitationById($citationId)
 	{
-		$citationId = isset($citationId['id']) ? $citationId['id'] : "";	
-		
-		$sql = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+		$citationId = isset($citationId['id']) ? $citationId['id'] : $citationId['citation_id'];	
+		$columnToSearch = isset($data['id']) ? 'id' : 'citation_id';
+
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :id";
 		$this->query($sql);
 		$this->bind("id", $citationId);
 		$this->data = $this->resultSet();
@@ -53,5 +54,23 @@ class Citation extends Model
 
 		// Return true if at least one row was deleted, otherwise false
 		return $this->rowCount() > 0;
+	}
+	public function updateCitation($data, $citation_id){
+			
+		$citationId = $citation_id['citation_id'];
+
+		$sql = "UPDATE " . $this->table_name . " SET citation_name = :citation_name WHERE citation_id = :citation_id";
+	
+		$this->query($sql);
+	
+		$this->bind(":citation_name", $data['citation_name']);
+		$this->bind(":citation_id", $citationId);
+	
+		$this->execute();
+	
+		$this->data = $this->getCitationById($citation_id);
+		$this->exist = ($this->rowCount() > 0);
+	
+		return $this->data;
 	}
 }
