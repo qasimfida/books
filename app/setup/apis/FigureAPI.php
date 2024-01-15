@@ -24,7 +24,7 @@ class FigureAPI extends Api
 
 	public function getById($bookId)
 	{
-		$book = json_decode(json_encode($this->figureModel->getFigure($bookId)), false);
+		$book = json_decode(json_encode($this->figureModel->getFigureById($bookId)), false);
 
 		if ($book !== false) {
 			header('Content-Type: application/json');
@@ -68,8 +68,9 @@ class FigureAPI extends Api
 		{
 		
 			$getSections = $this->figureModel->getFigureById($id);
+			var_dump($getSections);
 			if (!$getSections) {
-				echo json_encode(["success" => false, "error" => "Book not found"]);
+				echo json_encode(["success" => false, "error" => "Figure not found"]);
 				return;
 			}
 

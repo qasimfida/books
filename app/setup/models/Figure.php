@@ -4,7 +4,7 @@
 		
 		function __construct(){
 			$this->table_name = "Figures";
-		    $this->table_columns = ["id", "book_id","chapter_id","figure_name","figure_id"];
+		    $this->table_columns = ["id", "book_id","chapter_id","figure_name","figure_id", "figure_image"];
 		}
 
 		public function getFigure($data)
@@ -24,11 +24,11 @@
 		}
 		public function getFigureById($figureId)
 	{
-		$figureId = isset($figureId['id']) ? $figureId['id'] : "";	
+		$figureId = $figureId['figure_id'] ;
 		
-		$sql = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+		$sql = "SELECT * FROM " . $this->table_name . " WHERE figure_id = :figure_id";
 		$this->query($sql);
-		$this->bind("id", $figureId);
+		$this->bind("figure_id", $figureId);
 		$this->data = $this->resultSet();
 		$this->exist = ($this->rowCount() > 0);
 

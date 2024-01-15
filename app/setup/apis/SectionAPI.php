@@ -117,7 +117,7 @@
 			$getSection = json_decode(json_encode($this->sectionModel->getSectionById($bookId)), true);
 	
 			if (empty($getSection)) {
-				echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
+				echo json_encode(["success" => false, "error" => "No Section found with the Id identifier"]);
 				return;
 			}
 					
@@ -125,7 +125,7 @@
 				$updateResult = $this->sectionModel->delete($bookId); // Pass the condition here
 	
 				if ($updateResult !== false) {
-					echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
+					echo json_encode(["success" => true, "message" => "Section deleted successfully"]);
 				} else {
 					$error = $this->sectionModel->getError();
 					echo json_encode(["success" => false, "error" => $error]);
