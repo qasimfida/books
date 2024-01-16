@@ -41,19 +41,17 @@ class FigureAPI extends Api
 		if (is_array($request)) {
 			$book_id = $request['book_id'];
 		}
-
 		if (isset($_POST['figure_id'])) {
 			$figure_name = $_POST['figure_name'];
 			$figure_id = $_POST['figure_id'];
-			$image = $_POST['image'];
+			$figure_image = $_POST['figure_image'];
 
 			$result = $this->figureModel->insert([
 				"figure_name" => $figure_name,
 				"figure_id" => $figure_id,
 				"book_id" => $book_id,
-				"figure_image" => $image
+				"figure_image" => $figure_image
 			]);
-
 			header('Content-Type: application/json');
 
 			if ($result !== false) {
