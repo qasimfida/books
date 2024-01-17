@@ -9,9 +9,8 @@
 
 		public function getFigure($data)
 		{
-			
 			$bookId = isset($data['id']) ? $data['id'] : $data['figure_id'];
-			$columnToSearch = isset($data['id']) ? 'book_id' : 'id';
+			$columnToSearch = isset($data['figure_id']) ? 'book_id' : 'id';
 			$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :book_id";
 		
 			$this->query($sql);
