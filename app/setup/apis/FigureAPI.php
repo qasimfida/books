@@ -104,7 +104,7 @@ class FigureAPI extends Api
 		$getFigure = json_decode(json_encode($this->figureModel->getFigureById($bookId)), true);
 
 		if (empty($getFigure)) {
-			echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
+			echo json_encode(["success" => false, "error" => "No figure found with the Id identifier"]);
 			return;
 		}
 
@@ -112,7 +112,7 @@ class FigureAPI extends Api
 			$updateResult = $this->figureModel->delete($bookId); // Pass the condition here
 
 			if ($updateResult !== false) {
-				echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
+				echo json_encode(["success" => true, "message" => "Figure deleted successfully"]);
 			} else {
 				$error = $this->figureModel->getError();
 				echo json_encode(["success" => false, "error" => $error]);

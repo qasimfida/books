@@ -122,16 +122,15 @@ class CitationAPI extends Api
 		$getCitation = json_decode(json_encode($this->citationModel->getCitationById($bookId)), true);
 
 		if (empty($getCitation)) {
-			echo json_encode(["success" => false, "error" => "No chapter found with the Id identifier"]);
+			echo json_encode(["success" => false, "error" => "No citation found with the Id identifier"]);
 			return;
 		}
 				
 		try {
 			$updateResult = $this->citationModel->delete($bookId); // Pass the condition here
 
-			var_dump($updateResult);
 			if ($updateResult !== false) {
-				echo json_encode(["success" => true, "message" => "Chapter deleted successfully"]);
+				echo json_encode(["success" => true, "message" => "Citation deleted successfully"]);
 			} else {
 				$error = $this->citationModel->getError();
 				echo json_encode(["success" => false, "error" => $error]);
