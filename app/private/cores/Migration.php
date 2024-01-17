@@ -81,8 +81,8 @@ class Citation extends Migration {
             citation_id VARCHAR(255) NOT NULL,
             book_id INT,
             chapter_id INT,
-            FOREIGN KEY (book_id) REFERENCES books(id),
-            FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+            FOREIGN KEY (book_id) REFERENCES books(id)
+            -- FOREIGN KEY (chapter_id) REFERENCES chapters(id)
         )";
         $this->runMigration($sql);
     }
@@ -96,8 +96,8 @@ class Figure extends Migration {
             figure_image VARCHAR(255),
             book_id INT,
             chapter_id INT,
-            FOREIGN KEY (book_id) REFERENCES books(id),
-            FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+            FOREIGN KEY (book_id) REFERENCES books(id)
+            -- FOREIGN KEY (chapter_id) REFERENCES chapters(id)
         )";
         $this->runMigration($sql);
     }
