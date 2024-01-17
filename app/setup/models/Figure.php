@@ -23,10 +23,11 @@
 			
 			return $this->data;
 		}
-		public function getFigureById($figureId)
+		public function getFigureById($data)
 	{
-		$figureId = isset($figureId['id']) ? $figureId['id'] : $figureId['figure_id'];	
-		$columnToSearch = isset($data['id']) ? 'id' : 'figure_id';
+		$figureId = isset($data['id']) ? $data['id'] : $data['figure_id'];	
+		
+		$columnToSearch = isset($data['id']) ? 'book_id' : 'figure_id';
 
 		$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :figure_id";
 		$this->query($sql);

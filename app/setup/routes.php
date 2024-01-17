@@ -37,20 +37,20 @@ $routing->put("section/:id", "SectionAPI::put");
 $routing->delete("section/:id", "SectionAPI::delete");
 
 //citation
-$routing->post("citation/:book_id", "CitationAPI::post");
-$routing->get("citations/:id", "CitationAPI::getById");
-$routing->get("citations", "CitationAPI::get");
-$routing->get("citation/:citation_id", "CitationAPI::getById");
-$routing->put("citation/:citation_id", "CitationAPI::put");
-$routing->delete("citation/:citation_id", "CitationAPI::delete");
+$routing->post("citation/:book_id", "CitationAPI::post");//ok
+$routing->get("citations/:id", "CitationAPI::getById");//ok this will be book_id
+$routing->get("citations", "CitationAPI::get");//ok
+$routing->get("citation/:citation_id", "CitationAPI::getById");//ok
+$routing->put("citation/:citation_id", "CitationAPI::put");//ok
+$routing->delete("citation/:citation_id", "CitationAPI::delete");//ok
 
 //figure
-$routing->post("figure/:book_id", "FigureAPI::post");
-$routing->get("figures/:id", "FigureAPI::getById");
-$routing->get("figures", "FigureAPI::get");
-$routing->get("figure/:figure_id", "FigureAPI::getById");
-$routing->put("figure/:figure_id", "FigureAPI::put");
-$routing->delete("figure/:figure_id", "FigureAPI::delete");
+$routing->post("figure/:book_id", "FigureAPI::post");//ok
+$routing->get("figures/:id", "FigureAPI::getById");//ok
+$routing->get("figures", "FigureAPI::get");//ok
+$routing->get("figure/:figure_id", "FigureAPI::getById");//ok
+$routing->put("figure/:figure_id", "FigureAPI::put");//ok
+$routing->delete("figure/:figure_id", "FigureAPI::delete");//ok
 
 
 

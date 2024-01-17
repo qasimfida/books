@@ -26,10 +26,11 @@ class Citation extends Model
 
 		return $this->data;
 	}
-	public function getCitationById($citationId)
+	public function getCitationById($data)
 	{
-		$citationId = isset($citationId['id']) ? $citationId['id'] : $citationId['citation_id'];	
-		$columnToSearch = isset($data['id']) ? 'id' : 'citation_id';
+
+		$citationId = isset($data['id']) ? $data['id'] : $data['citation_id'];	
+		$columnToSearch = isset($data['id']) ? 'book_id' : 'citation_id';
 
 		$sql = "SELECT * FROM " . $this->table_name . " WHERE $columnToSearch = :id";
 		$this->query($sql);
