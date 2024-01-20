@@ -36,7 +36,13 @@ class FigureAPI extends Api
 		}
 	}
 
-
+	public function generateImageName($originalName)
+	{
+		$path = "assets/images/";
+		$date = date('YmdHis');
+		$uniqueName = "{$path}book_{$originalName}.jpg";
+		return $uniqueName;
+	}
 	public function post($request)
 	{
 		if (is_array($request)) {
@@ -46,27 +52,44 @@ class FigureAPI extends Api
 			$figure_name = $_POST['figure_name'];
 			$figure_id = $_POST['figure_id'];
 			$figure_image = $_POST['figure_image'];
+			if (strpos($figure_image, 'data:image') !== false) {
 
-			$result = $this->figureModel->insert([
-				"figure_name" => $figure_name,
-				"figure_id" => $figure_id,
-				"book_id" => $book_id,
-				"figure_image" => $figure_image
-			]);
-			header('Content-Type: application/json');
 
-			if ($result !== false) {
-				echo json_encode(["success" => true, "data" => $result]);
-				return;
-			} else {
-				$error = $this->figureModel->getError();
-				echo json_encode(["success" => false, "error" => $error]);
+				$imageData = explode(',', $figure_image);
+				$image = base64_decode($imageData[1]);				 
+				$fileName = $this->generateImageName($figure_id);
+
+				$filePath =  $fileName;
+				file_put_contents($filePath, $image);
+				$figure_image	 = $fileName;
+				if (!empty($figure_name)) {
+					$result = $this->figureModel->insert([
+						"figure_name" => $figure_name,
+						"figure_id" => $figure_id,
+						"book_id" => $book_id,
+						"figure_image" => $figure_image
+					]);
+					header('Content-Type: application/json');
+	
+					if ($result !== false) {
+						echo json_encode(["success" => true, "data" => $result]);
+						return;
+					} else {
+						$error = $this->figureModel->getError();
+						echo json_encode(["success" => false, "error" => $error]);
+					}
+				} else {
+					echo json_encode(["success" => false, "error" => "Image file not uploaded or processed correctly"]);
+				}
+				
+			}else {
+				echo json_encode(["success" => false, "error" => "Figure Image Upload error"]);
 			}
-		} else {
+		}else {
 			echo json_encode(["success" => false, "error" => "Figure Id not defined"]);
 		}
 	}
-	
+
 	public function put($id)
 	{
 		$getFigure = $this->figureModel->getFigureById($id);
@@ -85,8 +108,8 @@ class FigureAPI extends Api
 			"figure_id" => $id,
 		];
 
-		
-		try{
+
+		try {
 			$updateResult = $this->figureModel->updateFigure($newData, $id);
 			if ($updateResult !== false) {
 				echo json_encode(["success" => true, "data" => $updateResult]);
@@ -97,13 +120,21 @@ class FigureAPI extends Api
 		} catch (Exception $e) {
 			echo json_encode(["success" => false, "error" => $e->getMessage()]);
 		}
-		
 	}
 
 	public function delete($bookId)
 	{
 		$getFigure = json_decode(json_encode($this->figureModel->getFigureById($bookId)), true);
 
+		
+		$image = $getFigure[0]->figure_image;
+		$filePath =  $image;
+		if (file_exists($filePath)) {
+			if (unlink($filePath)) {
+			} else {
+				echo json_encode(["success" => false, "error" => "Failed to delete image file"]);
+			}
+		}
 		if (empty($getFigure)) {
 			echo json_encode(["success" => false, "error" => "No figure found with the Id identifier"]);
 			return;

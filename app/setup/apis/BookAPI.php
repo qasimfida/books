@@ -97,9 +97,6 @@ class BookAPI extends Api
 			$book_title = $_POST['book_title'];
 			$author = $_POST['author'];
 			$description = isset($_POST['description']) ? $_POST['description'] : '';
-			// $fileHandler = new File("assets/images/");
-			// $fileName = @$_FILES['image']['name'];
-			
 			$image = $_POST['image'];
 
 			if (strpos($image, 'data:image') !== false) {
