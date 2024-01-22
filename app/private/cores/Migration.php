@@ -63,7 +63,7 @@ class Sections extends Migration {
         $sql = "CREATE TABLE IF NOT EXISTS sections (
             id INT AUTO_INCREMENT PRIMARY KEY,
             section_title VARCHAR(255) NOT NULL,
-            content TEXT,
+            content LONGTEXT,
             chapter_id INT,
             FOREIGN KEY (chapter_id) REFERENCES chapters(id),
             book_id INT,

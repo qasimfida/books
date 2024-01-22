@@ -62,11 +62,13 @@ class CitationAPI extends Api
 
 			$citation_name = $_POST['citation_name'];
 			$citation_id = $_POST['citation_id'];
+			$chapter_id = $_POST['chapter_id'];
 
 			$result = $this->citationModel->insert([
 				"citation_name" => $citation_name,
 				"citation_id" => $citation_id,
-				"book_id" => $book_id
+				"book_id" => $book_id,
+				"chapter_id" => $chapter_id
 
 			]);
 
