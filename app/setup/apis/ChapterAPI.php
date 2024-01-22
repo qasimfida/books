@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test class
+ * Chapter class
  */
 class ChapterAPI extends Api
 {
@@ -91,7 +91,6 @@ class ChapterAPI extends Api
 		];
 
 		$called_id = ['id' => $id];
-		var_dump($called_id);
 
 		try {
 			$updateResult = $this->chapterModel->update($newData, $called_id);

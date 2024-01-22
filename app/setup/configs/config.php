@@ -21,11 +21,11 @@
 	}else{
 
 		# MYSQL Database Configuration
-		define('DB_HOSTNAME', '');
-		define('DB_USERNAME', '');
-		define('DB_PASSWORD', '');
-		define('DB_NAME', '');
-		define('DB_ERROR', false);
+		define('DB_HOSTNAME', 'localhost');
+		define('DB_USERNAME', 'myxtaomy_qasim');
+		define('DB_PASSWORD', 'Xuym%CQ0&#!x');
+		define('DB_NAME', 'myxtaomy_AW-Dev3');
+		define('DB_ERROR', true);
 		define('ENVIRONMENT', "PROD");
 
 	}

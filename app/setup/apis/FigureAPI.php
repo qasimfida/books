@@ -6,7 +6,7 @@ class FigureAPI extends Api
 	private $figureModel;
 	function __construct()
 	{
-		$this->figureModel = $this->model("figure");
+		$this->figureModel = $this->model("Figure");
 	}
 	public function get()
 	{
@@ -45,35 +45,44 @@ class FigureAPI extends Api
 	}
 	public function post($request)
 	{
-		if (is_array($request)) {
+		// Check if the request is an array and contains the required 'book_id'
+		if (is_array($request) && isset($request['book_id'])) {
 			$book_id = $request['book_id'];
+		} else {
+			echo json_encode(["success" => false, "error" => "Book ID not defined"]);
+			return;
 		}
+	
+		// Check if 'figure_id' is set in the POST request
 		if (isset($_POST['figure_id'])) {
-			$figure_name = $_POST['figure_name'];
+			$figure_name = $_POST['figure_name'] ?? '';
 			$figure_id = $_POST['figure_id'];
 			$figure_image = $_POST['figure_image'];
+			$chapter_id = $_POST['chapter_id'] ?? null; // Use null coalescing operator for optional fields
+	
+			// Process the figure image if it's in the expected format
 			if (strpos($figure_image, 'data:image') !== false) {
-
-
 				$imageData = explode(',', $figure_image);
-				$image = base64_decode($imageData[1]);				 
+				$image = base64_decode($imageData[1]);
 				$fileName = $this->generateImageName($figure_id);
-
-				$filePath =  $fileName;
+				$filePath = $fileName;
 				file_put_contents($filePath, $image);
-				$figure_image	 = $fileName;
+				$figure_image = $fileName;
+	
 				if (!empty($figure_name)) {
+					// Insert data into the model
 					$result = $this->figureModel->insert([
 						"figure_name" => $figure_name,
 						"figure_id" => $figure_id,
 						"book_id" => $book_id,
-						"figure_image" => $figure_image
+						"figure_image" => $figure_image,
+						"chapter_id" => $chapter_id
 					]);
-					header('Content-Type: application/json');
 	
+					// Return the appropriate response
+					header('Content-Type: application/json');
 					if ($result !== false) {
 						echo json_encode(["success" => true, "data" => $result]);
-						return;
 					} else {
 						$error = $this->figureModel->getError();
 						echo json_encode(["success" => false, "error" => $error]);
@@ -81,11 +90,10 @@ class FigureAPI extends Api
 				} else {
 					echo json_encode(["success" => false, "error" => "Image file not uploaded or processed correctly"]);
 				}
-				
-			}else {
+			} else {
 				echo json_encode(["success" => false, "error" => "Figure Image Upload error"]);
 			}
-		}else {
+		} else {
 			echo json_encode(["success" => false, "error" => "Figure Id not defined"]);
 		}
 	}

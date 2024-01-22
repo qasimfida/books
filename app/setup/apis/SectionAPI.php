@@ -1,12 +1,12 @@
 <?php
 
 	/**
-	 * Test class
+	 * SectionAPI class
 	 */
 	class SectionAPI extends Api{
 		private $sectionModel;
 		function __construct(){
-			$this->sectionModel = $this->model("section");
+			$this->sectionModel = $this->model("Section");
 		}
 		public function get()
 		{

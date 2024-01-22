@@ -150,7 +150,7 @@ class Core{
 	# Hard coded reponse for not found
 	private function throwError(){
 
-		if( ENVIRONMENT == "DEV" ){
+		if( ENVIRONMENT == "PROD" ){
 			http_response_code(400);
 			echo json_encode([
 				"status" => false,

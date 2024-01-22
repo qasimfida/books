@@ -6,12 +6,6 @@ $routing = new Routing();
 require_once('Middleware.php');
 Middleware::handle();
 
-/** Authentication Test */
-$routing->post("auth/login", "AuthAPI::login");
-$routing->post("auth/register", "AuthAPI::register");
-$routing->post("auth/check", "AuthAPI::check");
-$routing->post("auth/logout", "AuthAPI::logout");
-
 //books
 $routing->post("books", "BookAPI::post");
 $routing->put("books/:id", "BookAPI::put");
