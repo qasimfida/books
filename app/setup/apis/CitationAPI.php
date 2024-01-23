@@ -48,10 +48,7 @@ class CitationAPI extends Api
 			echo json_encode(["success" => false, "error" => "error"]);
 		}
 	}
-
-
-
-
+	
 	public function post($request)
 	{
 		if (is_array($request)) {
@@ -62,13 +59,15 @@ class CitationAPI extends Api
 
 			$citation_name = $_POST['citation_name'];
 			$citation_id = $_POST['citation_id'];
-			$chapter_id = $_POST['chapter_id'];
+			$chapter_id = $_POST['chapter_id'] ?? "";
+			$section_id = $_POST['section_id'] ?? "";
 
 			$result = $this->citationModel->insert([
 				"citation_name" => $citation_name,
 				"citation_id" => $citation_id,
 				"book_id" => $book_id,
-				"chapter_id"=>$chapter_id
+				"chapter_id" => $chapter_id,
+				"section_id" => $section_id
 
 			]);
 

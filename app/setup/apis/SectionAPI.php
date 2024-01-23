@@ -5,8 +5,12 @@
 	 */
 	class SectionAPI extends Api{
 		private $sectionModel;
+		private $figureModel;
+		private $citationModel;
 		function __construct(){
 			$this->sectionModel = $this->model("Section");
+			$this->citationModel = $this->model("Citation");
+			$this->figureModel = $this->model("Figure");
 		}
 		public function get()
 		{
@@ -58,7 +62,7 @@
 					"section_title" => $section_title,
                     "content" => $content,
 					"chapter_id" => $chapter_id,
-					"book_id" => $book_id
+					"book_id" => $book_id,
 
 				]);
 		
@@ -115,6 +119,8 @@
 		public function delete($bookId)
 		{
 			$getSection = json_decode(json_encode($this->sectionModel->getSectionById($bookId)), true);
+			$deleteFigure = json_decode(json_encode($this->figureModel->deleteFigureByType($bookId, $type="section")), true);
+			$deleteCitation = json_decode(json_encode($this->citationModel->deleteCitationByType($bookId, $type="section")), true);
 	
 			if (empty($getSection)) {
 				echo json_encode(["success" => false, "error" => "No Section found with the Id identifier"]);
@@ -123,8 +129,8 @@
 					
 			try {
 				$updateResult = $this->sectionModel->delete($bookId); // Pass the condition here
-	
-				if ($updateResult !== false) {
+
+				if ($updateResult !== false || $deleteCitation || $deleteFigure ) {
 					echo json_encode(["success" => true, "message" => "Section deleted successfully"]);
 				} else {
 					$error = $this->sectionModel->getError();
