@@ -12,7 +12,7 @@ require_once 'setup/configs/config.php';
 require_once 'setup/helpers/Utilities.php';
 
 /** Error Reporting */
-if (ENVIRONMENT != "DEV") {
+if (ENVIRONMENT != "PROD") {
 	error_reporting(0);
 	set_error_handler(function () {
 		http_response_code(500);

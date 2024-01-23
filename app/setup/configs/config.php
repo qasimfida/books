@@ -25,7 +25,7 @@
 		define('DB_USERNAME', 'myxtaomy_qasim');
 		define('DB_PASSWORD', 'Xuym%CQ0&#!x');
 		define('DB_NAME', 'myxtaomy_AW-Dev3');
-		define('DB_ERROR', true);
+		define('DB_ERROR', false);
 		define('ENVIRONMENT', "PROD");
 
 	}
