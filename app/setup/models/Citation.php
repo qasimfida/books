@@ -5,8 +5,8 @@ class Citation extends Model
 
 	function __construct()
 	{
-		$this->table_name = "Citations";
-		$this->table_columns = ["id", "book_id", "citation_id", "citation_name"];
+		$this->table_name = "citations";
+		$this->table_columns = ["id", "book_id","section_id",  "citation_id","chapter_id", "citation_name"];
 	}
 
 	public function getCitation($data)
@@ -70,6 +70,27 @@ class Citation extends Model
 		$this->execute();
 	
 		$this->data = $this->getCitationById($citation_id);
+		$this->exist = ($this->rowCount() > 0);
+	
+		return $this->data;
+	}
+
+	public function deleteCitationByType($data, $type)
+	{
+
+
+		$bookId = isset($data['id']) ? $data['id'] : "";
+	
+		$findType =  $type == "chapter" ? "chapter_id" : "section_id";
+		
+		$sql = "DELETE FROM " . $this->table_name . " WHERE $findType = :id";
+	
+		$this->query($sql);
+
+		$this->bind("id", $bookId);
+
+		$this->data = $this->resultSet();
+
 		$this->exist = ($this->rowCount() > 0);
 	
 		return $this->data;
